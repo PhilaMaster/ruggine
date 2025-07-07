@@ -6,7 +6,7 @@ use dotenvy::dotenv;
 use std::env;
 use crate::models::{User};
 use crate::schema::users;
-use actix_web::{web, App, HttpServer, Result, HttpResponse, middleware::Logger};
+use actix_web::{web, App, HttpServer, Result, HttpResponse, middleware::Logger, HttpRequest};
 use serde::{Deserialize, Serialize};
 use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
 
@@ -145,6 +145,29 @@ async fn login_handler(user_data: web::Json<CreateUserRequest>) -> Result<HttpRe
     }
 }
 
+async fn test_handler(req: HttpRequest) -> Result<HttpResponse> {
+    if let Some(auth_header) = req.headers().get("Authorization") {
+        if let Ok(token) = auth_header.to_str() {
+            // `token` is a struct with 2 fields: `header` and `claims` where `claims` is your own struct.
+            let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+            let token = decode::<Claims>(&token, &DecodingKey::from_secret(jwt_secret.as_ref()), &Validation::default());
+            match token {
+                Ok(token) => {
+                    return Ok(HttpResponse::Ok().json(serde_json::json!({
+                        "message": "Token valido",
+                        "user_id": token.claims.user_id,
+                        "username": token.claims.username,
+                    })));
+                }
+                Err(_) => {
+                    return Ok(HttpResponse::Unauthorized().body("Token non valido"));
+                }
+            }
+        }
+    }
+    Ok(HttpResponse::Unauthorized().body("Token mancante o non valido"))
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
@@ -161,6 +184,7 @@ async fn main() -> std::io::Result<()> {
             .route("/api/users", web::post().to(create_user_handler))
             .route("/api/users", web::get().to(get_users_handler))
             .route("/api/login", web::post().to(login_handler))
+            .route("/api/test", web::get().to(test_handler))
     })
     .bind("127.0.0.1:8080")?
     .run()
