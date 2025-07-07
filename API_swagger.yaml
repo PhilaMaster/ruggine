@@ -143,12 +143,12 @@ paths:
                   type: integer
                   
       responses:
-        '200':
-          description: Invito inviato
+        '201':
+          description: Invito creato
         '401':
           description: Token non valido
         '403':
-          description: Non autorizzato
+          description: L'utente che vuole creare l'invito non fa parte del gruppo
 
     get:
       tags:
@@ -191,7 +191,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        '204':
           description: Invito cancellato con successo
         '401':
           description: Token non valido
