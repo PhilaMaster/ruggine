@@ -17,3 +17,4 @@ jsonwebtoken = "9"
 argon2 = "0.5"
 rand_core = { version = "0.6", features = ["getrandom"] }
 password-hash = "0.5"
+futures = "0.3.31"
