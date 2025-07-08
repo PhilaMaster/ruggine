@@ -2,13 +2,12 @@ pub mod user{
     use actix_web::{web, HttpResponse};
     use crate::utility::connection::establish_connection;
     use crate::utility::user::user::{create_user, get_all_users, hash_password, CreateUserRequest, UserResponse};
-
+    
     // API Endpoints
     pub(crate) async fn create_user_handler(user_data: web::Json<CreateUserRequest>) -> actix_web::Result<HttpResponse> {
         let mut conn = establish_connection();
 
-        // In un'app reale dovresti hashare la password con bcrypt
-        let password_hash = hash_password(user_data.0.clone());
+        let password_hash = hash_password(user_data.password.as_str()).expect("Failed to hash password");
 
         match create_user(&mut conn, &user_data.username, &password_hash) {
             Ok(user) => {

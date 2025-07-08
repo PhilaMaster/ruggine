@@ -10,7 +10,7 @@ pub mod authorization{
     pub(crate) async fn login_handler(user_data: web::Json<CreateUserRequest>) -> Result<HttpResponse> {
         let mut conn = establish_connection();
 
-        match authenticate_user(&mut conn, user_data.0){
+        match authenticate_user(&mut conn, user_data.username.as_str(), user_data.password.as_str()) {
             Ok(user) => {
                 let my_claims = Claims::new(
                     user.id.to_string(),
@@ -34,8 +34,9 @@ pub mod authorization{
 
     pub(crate) async fn test_handler(req: HttpRequest) -> Result<HttpResponse> {
         if let Some(auth_header) = req.headers().get("Authorization") {
-            if let Ok(token) = auth_header.to_str() {
-                // `token` is a struct with 2 fields: `header` and `claims` where `claims` is your own struct.
+            if let Ok(token_header) = auth_header.to_str() {
+                //il token ricevuto è del tipo "Bearer <token>" quindi dobbiamo rimuovere "Bearer "
+                let token = token_header.trim_start_matches("Bearer ");
                 let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
                 let token = decode::<Claims>(&token, &DecodingKey::from_secret(jwt_secret.as_ref()), &Validation::default());
                 match token {

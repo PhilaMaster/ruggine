@@ -14,3 +14,6 @@ env_logger = "0.11.8"
 getrandom = "0.2"
 libsqlite3-sys = { version = "*", features = ["bundled"] }
 jsonwebtoken = "9"
+argon2 = "0.5"
+rand_core = { version = "0.6", features = ["getrandom"] }
+password-hash = "0.5"

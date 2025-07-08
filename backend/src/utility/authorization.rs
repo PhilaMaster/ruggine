@@ -4,7 +4,7 @@ pub mod authorization{
     use crate::schema::users;
     use actix_web::{HttpResponse};
     use serde::{Deserialize, Serialize};
-    use crate::utility::user::user::{hash_password, CreateUserRequest};
+    use crate::utility::user::user::{verify_password };
 
     /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
     #[derive(Debug, Serialize, Deserialize)]
@@ -28,13 +28,21 @@ pub mod authorization{
         }
     }
 
-    pub fn authenticate_user(conn: &mut SqliteConnection, user: CreateUserRequest) -> QueryResult<User> {
-        //let password_hash = format!("hashed_{}", user.password);
-        // la funzione per hashare la password magari la mettiamo in utility.user???
-        let password_hash = hash_password(user.clone());
-        users::table
-            .filter(users::username.eq(user.username))
-            .filter(users::password_hash.eq(password_hash))
-            .first(conn)
+    pub fn authenticate_user(conn: &mut SqliteConnection, username: &str, password: &str) -> QueryResult<User> {
+        let user = users::table
+            .filter(users::username.eq(username))
+            .first::<User>(conn);
+        if let Ok(user) = user {
+            println!("User found: {:?}", user);
+            if verify_password(&user.password_hash, password).expect("Failed to verify password") {
+                println!("Password verified for user");
+                return Ok(user);
+            }else {
+                print!("Password verification failed for user");
+                return Err(diesel::result::Error::NotFound);
+            }
+        }else {
+            return Err(diesel::result::Error::NotFound);
+        }
     }
 }
