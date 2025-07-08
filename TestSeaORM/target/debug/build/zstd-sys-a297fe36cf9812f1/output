@@ -1,0 +1,287 @@
+cargo:rerun-if-env-changed=ZSTD_SYS_USE_PKG_CONFIG
+OUT_DIR = Some(C:\Users\edoar\OneDrive - Politecnico di Torino\Poli\4QuartoAnno\PDS\Ruggine-ongoing\TestSeaORM\target\debug\build\zstd-sys-a297fe36cf9812f1\out)
+OPT_LEVEL = Some(0)
+TARGET = Some(x86_64-pc-windows-msvc)
+cargo:rerun-if-env-changed=VCINSTALLDIR
+VCINSTALLDIR = None
+cargo:rerun-if-env-changed=VSTEL_MSBuildProjectFullPath
+VSTEL_MSBuildProjectFullPath = None
+cargo:rerun-if-env-changed=VSCMD_ARG_VCVARS_SPECTRE
+VSCMD_ARG_VCVARS_SPECTRE = None
+cargo:rerun-if-env-changed=WindowsSdkDir
+WindowsSdkDir = None
+cargo:rerun-if-env-changed=WindowsSDKVersion
+WindowsSDKVersion = None
+cargo:rerun-if-env-changed=LIB
+LIB = None
+PATH = Some(C:\Users\edoar\OneDrive - Politecnico di Torino\Poli\4QuartoAnno\PDS\Ruggine-ongoing\TestSeaORM\target\debug\deps;C:\Users\edoar\OneDrive - Politecnico di Torino\Poli\4QuartoAnno\PDS\Ruggine-ongoing\TestSeaORM\target\debug;C:\Users\edoar\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\lib;C:\Python313\Scripts\;C:\Python313\;C:\Program Files\Eclipse Adoptium\jdk-8.0.422.5-hotspot\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files\Eclipse Adoptium\jdk-17.0.10.7-hotspot\bin;C:\Program Files\Amazon Corretto\jdk17.0.10_7\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\MATLAB\R2023b\bin;C:\Program Files\apache-maven-3.9.6\bin;C:\Program Files\gnuplot\bin;C:\Program Files\dotnet\;C:\ProgramData\chocolatey\bin;C:\Users\edoar\AppData\Local\nvm;C:\nvm4w\nodejs;C:\Program Files\Docker\Docker\resources\bin;C:\Users\edoar\.cargo\bin;C:\Users\edoar\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\edoar\AppData\Local\Programs\Python\Python310\;C:\Users\edoar\AppData\Local\Microsoft\WindowsApps;C:\Program Files\JetBrains\PyCharm Community Edition 2023.1.1\bin;;C:\Users\edoar\AppData\Roaming\Python\Python310\Scripts;C:\Users\edoar\AppData\Local\GitHubDesktop\bin;C:\Users\edoar\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\JetBrains\CLion 2023.1.4\bin;;C:\Program Files\apache-maven-3.9.6\bin;C:\winutils\bin;C:\Users\edoar\miniconda3;C:\Program Files\JetBrains\RustRover 2024.3.5\bin;;C:\Users\edoar\AppData\Roaming\npm;C:\Users\edoar\AppData\Local\nvm;C:\nvm4w\nodejs;C:\Users\edoar\.rustup\toolchains\stable-x86_64-pc-windows-msvc\bin)
+cargo:rerun-if-env-changed=INCLUDE
+INCLUDE = None
+HOST = Some(x86_64-pc-windows-msvc)
+cargo:rerun-if-env-changed=CC_x86_64-pc-windows-msvc
+CC_x86_64-pc-windows-msvc = None
+cargo:rerun-if-env-changed=CC_x86_64_pc_windows_msvc
+CC_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+CARGO_CFG_TARGET_FEATURE = Some(cmpxchg16b,fxsr,sse,sse2,sse3)
+DEBUG = Some(true)
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_pc_windows_msvc
+CFLAGS_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-pc-windows-msvc
+CFLAGS_x86_64-pc-windows-msvc = None
+CARGO_ENCODED_RUSTFLAGS = Some()
+OUT_DIR = Some(C:\Users\edoar\OneDrive - Politecnico di Torino\Poli\4QuartoAnno\PDS\Ruggine-ongoing\TestSeaORM\target\debug\build\zstd-sys-a297fe36cf9812f1\out)
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+TARGET = Some(x86_64-pc-windows-msvc)
+CARGO_CFG_TARGET_FEATURE = Some(cmpxchg16b,fxsr,sse,sse2,sse3)
+HOST = Some(x86_64-pc-windows-msvc)
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_pc_windows_msvc
+CFLAGS_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-pc-windows-msvc
+CFLAGS_x86_64-pc-windows-msvc = None
+OUT_DIR = Some(C:\Users\edoar\OneDrive - Politecnico di Torino\Poli\4QuartoAnno\PDS\Ruggine-ongoing\TestSeaORM\target\debug\build\zstd-sys-a297fe36cf9812f1\out)
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+TARGET = Some(x86_64-pc-windows-msvc)
+CARGO_CFG_TARGET_FEATURE = Some(cmpxchg16b,fxsr,sse,sse2,sse3)
+HOST = Some(x86_64-pc-windows-msvc)
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_pc_windows_msvc
+CFLAGS_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-pc-windows-msvc
+CFLAGS_x86_64-pc-windows-msvc = None
+OUT_DIR = Some(C:\Users\edoar\OneDrive - Politecnico di Torino\Poli\4QuartoAnno\PDS\Ruggine-ongoing\TestSeaORM\target\debug\build\zstd-sys-a297fe36cf9812f1\out)
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+TARGET = Some(x86_64-pc-windows-msvc)
+CARGO_CFG_TARGET_FEATURE = Some(cmpxchg16b,fxsr,sse,sse2,sse3)
+HOST = Some(x86_64-pc-windows-msvc)
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_pc_windows_msvc
+CFLAGS_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-pc-windows-msvc
+CFLAGS_x86_64-pc-windows-msvc = None
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+debug.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+entropy_common.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+error_private.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+fse_decompress.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+pool.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+threading.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_common.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+fse_compress.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+hist.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+huf_compress.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+zstd_compress.c
+exit code: cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_compress_literals.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_compress_sequences.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_compress_superblock.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_double_fast.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_fast.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_lazy.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_ldm.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_opt.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_preSplit.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+zstdmt_compress.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+huf_decompress.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_ddict.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_decompress.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_decompress_block.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+cover.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+divsufsort.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+fastcover.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zdict.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+zstd_v01.c
+exit code: cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_v02.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_v03.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+zstd_v04.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_v05.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_v06.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+zstd_v07.c
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+cargo:warning=cl : warning della riga di comando D9002 : l'opzione sconosciuta '-fvisibility=hidden' verr… ignorata
+
+0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+exit code: 0
+cargo:rerun-if-env-changed=AR_x86_64-pc-windows-msvc
+AR_x86_64-pc-windows-msvc = None
+cargo:rerun-if-env-changed=AR_x86_64_pc_windows_msvc
+AR_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=HOST_AR
+HOST_AR = None
+cargo:rerun-if-env-changed=AR
+AR = None
+cargo:rerun-if-env-changed=ARFLAGS
+ARFLAGS = None
+cargo:rerun-if-env-changed=HOST_ARFLAGS
+HOST_ARFLAGS = None
+cargo:rerun-if-env-changed=ARFLAGS_x86_64_pc_windows_msvc
+ARFLAGS_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=ARFLAGS_x86_64-pc-windows-msvc
+ARFLAGS_x86_64-pc-windows-msvc = None
+cargo:rustc-link-lib=static=zstd
+cargo:rustc-link-search=native=C:\Users\edoar\OneDrive - Politecnico di Torino\Poli\4QuartoAnno\PDS\Ruggine-ongoing\TestSeaORM\target\debug\build\zstd-sys-a297fe36cf9812f1\out
+cargo:root=C:\Users\edoar\OneDrive - Politecnico di Torino\Poli\4QuartoAnno\PDS\Ruggine-ongoing\TestSeaORM\target\debug\build\zstd-sys-a297fe36cf9812f1\out
+cargo:include=C:\Users\edoar\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\zstd-sys-2.0.15+zstd.1.5.7\zstd/lib
