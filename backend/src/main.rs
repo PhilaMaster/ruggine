@@ -6,8 +6,9 @@ use dotenvy::dotenv;
 use std::env;
 use crate::models::{User};
 use crate::schema::users;
-use actix_web::{web, App, HttpServer, Result, HttpResponse, middleware::Logger};
+use actix_web::{web, App, HttpServer, Result, HttpResponse, middleware::Logger, HttpRequest};
 use serde::{Deserialize, Serialize};
+use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
 
 // user utility
 #[derive(Deserialize)]
@@ -105,9 +106,72 @@ async fn get_users_handler() -> Result<HttpResponse> {
     }
 }
 
+/// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims {
+    user_id: String,
+    username: String,
+    exp: usize,
+}
+pub fn authenticate_user(conn: &mut SqliteConnection, username: &str, password: &str) -> QueryResult<User> {
+    let password_hash = format!("hashed_{}", password);
+    users::table
+        .filter(users::username.eq(username))
+        .filter(users::password_hash.eq(password_hash))
+        .first(conn)
+}
+async fn login_handler(user_data: web::Json<CreateUserRequest>) -> Result<HttpResponse> {
+    let mut conn = establish_connection();
+    
+    match authenticate_user(&mut conn, user_data.username.as_str(), user_data.password.as_str()){
+        Ok(user) => {
+            let my_claims = Claims {
+                user_id: user.id.to_string(),
+                username: user.username,
+                exp: 10000000000, // Example expiration time
+            };;
+            let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+            let token = encode(&Header::default(), &my_claims, &EncodingKey::from_secret(jwt_secret.as_ref()))
+                .expect("Failed to encode JWT");
+            Ok(HttpResponse::Ok().json(serde_json::json!({
+                "token": token,
+            })))
+        }
+        Err(_) => {
+            Ok(HttpResponse::InternalServerError().json(serde_json::json!({
+                "error": "Failed to authenticate user"
+            })))
+        }
+    }
+}
+
+async fn test_handler(req: HttpRequest) -> Result<HttpResponse> {
+    if let Some(auth_header) = req.headers().get("Authorization") {
+        if let Ok(token) = auth_header.to_str() {
+            // `token` is a struct with 2 fields: `header` and `claims` where `claims` is your own struct.
+            let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+            let token = decode::<Claims>(&token, &DecodingKey::from_secret(jwt_secret.as_ref()), &Validation::default());
+            match token {
+                Ok(token) => {
+                    return Ok(HttpResponse::Ok().json(serde_json::json!({
+                        "message": "Token valido",
+                        "user_id": token.claims.user_id,
+                        "username": token.claims.username,
+                    })));
+                }
+                Err(_) => {
+                    return Ok(HttpResponse::Unauthorized().body("Token non valido"));
+                }
+            }
+        }
+    }
+    Ok(HttpResponse::Unauthorized().body("Token mancante o non valido"))
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
+
 
     println!("🚀 Server starting on http://localhost:8080");
     println!("📖 API endpoints:");
@@ -119,6 +183,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .route("/api/users", web::post().to(create_user_handler))
             .route("/api/users", web::get().to(get_users_handler))
+            .route("/api/login", web::post().to(login_handler))
+            .route("/api/test", web::get().to(test_handler))
     })
     .bind("127.0.0.1:8080")?
     .run()
