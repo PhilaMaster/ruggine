@@ -3,21 +3,6 @@
 version = 4
 
 [[package]]
-name = "TestSeaORM"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "diesel",
- "dotenvy",
- "env_logger",
- "getrandom 0.2.16",
- "libsqlite3-sys",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
 name = "actix-codec"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -294,6 +279,21 @@ name = "autocfg"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
+
+[[package]]
+name = "backend"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "diesel",
+ "dotenvy",
+ "env_logger",
+ "getrandom 0.2.16",
+ "libsqlite3-sys",
+ "serde",
+ "serde_json",
+ "tokio",
+]
 
 [[package]]
 name = "backtrace"
