@@ -16,7 +16,7 @@ pub mod authorization{
                 let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() as usize;
                 let expiration = now + 604800; // 604800 secondi = 1 settimana
                 let my_claims = Claims::new(
-                    user.id.to_string(),
+                    user.id,
                     user.username,
                     expiration, 
                 );

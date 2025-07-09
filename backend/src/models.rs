@@ -27,7 +27,7 @@ pub struct GroupMessage {
     pub sent_at: String,
 }
 
-#[derive(Queryable, Debug, Identifiable)]
+#[derive(Queryable, Debug, Identifiable, Serialize)]
 #[diesel(table_name = private_message)]
 pub struct PrivateMessage {
     pub id: i32,

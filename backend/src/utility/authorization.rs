@@ -9,13 +9,13 @@ pub mod authorization{
     /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
     #[derive(Debug, Serialize, Deserialize)]
     pub(crate) struct Claims {
-        pub user_id: String,
+        pub user_id: i32,
         pub username: String,
         pub exp: usize,
     }
 
     impl Claims {
-        pub fn new(user_id: String, username: String, exp: usize) -> Self {
+        pub fn new(user_id: i32, username: String, exp: usize) -> Self {
             Claims { user_id, username, exp }
         }
 
