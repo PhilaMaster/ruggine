@@ -9,13 +9,13 @@ pub mod authorization{
     /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
     #[derive(Debug, Serialize, Deserialize)]
     pub(crate) struct Claims {
-        user_id: String,
-        username: String,
-        exp: usize,
+        pub user_id: i32,
+        pub username: String,
+        pub exp: usize,
     }
 
     impl Claims {
-        pub fn new(user_id: String, username: String, exp: usize) -> Self {
+        pub fn new(user_id: i32, username: String, exp: usize) -> Self {
             Claims { user_id, username, exp }
         }
 
@@ -33,12 +33,9 @@ pub mod authorization{
             .filter(users::username.eq(username))
             .first::<User>(conn);
         if let Ok(user) = user {
-            println!("User found: {:?}", user);
             if verify_password(&user.password_hash, password).expect("Failed to verify password") {
-                println!("Password verified for user");
                 return Ok(user);
             }else {
-                print!("Password verification failed for user");
                 return Err(diesel::result::Error::NotFound);
             }
         }else {
