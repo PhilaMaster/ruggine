@@ -6,13 +6,14 @@ import 'package:ruggine_client/core/const.dart';
 import 'UI/pages/home_page.dart';
 import 'UI/pages/login_page.dart';
 import 'UI/providers/auth_provider.dart';
+import 'UI/providers/message_service.dart';
 
 void main() {
   runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,6 +37,7 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Chat App',
       routerConfig: router,
+      scaffoldMessengerKey: MessageService.messengerKey,
     );
   }
 }

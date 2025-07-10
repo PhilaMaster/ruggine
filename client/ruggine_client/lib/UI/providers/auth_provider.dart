@@ -22,13 +22,12 @@ class AuthNotifier extends StateNotifier<bool> {
     state = await repo.isLoggedIn();
   }
 
-  Future<void> login(String username, String password) async {
-    try{
-      await repo.login(username, password);
+  Future<String?> login(String username, String password) async {
+    final error = await repo.login(username, password);
+    if (error == null) {
       state = true;
-    }catch (e) {
-      throw Exception('Login failed: $e');
     }
+    return error;
   }
 
   void logout() async {

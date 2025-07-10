@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import 'api_client.dart';
@@ -9,18 +10,25 @@ class AuthRepo{
 
   AuthRepo(this._apiClient);
 
-  Future<String> login(String username, String password) async {
+  Future<String?> login(String username, String password) async {
     if (kDebugMode) {
       print("Attempting to login with username: $username");
     }
-    await _apiClient.login(username, password).then((response) {
-      if (response.statusCode != 200) {
-        throw Exception('Login failed with status code: ${response.statusCode}');
+    try {
+      await _apiClient.login(username, password).then((response) {
+        final token = response.data['token'];
+        SecureStorage.writeToken(token);
+      });
+    }on DioException catch (err) {
+      if (kDebugMode) {
+        print("${err.response?.data['error']}");
       }
-      final token = response.data['token'];
-      SecureStorage.writeToken(token);
-    });
-    return "Login successful";
+      return err.response?.data['error'];
+    }
+    catch (e) {
+      return "An unexpected error occurred: $e";
+    }
+    return null;
   }
 
   Future<void> logout() async {
