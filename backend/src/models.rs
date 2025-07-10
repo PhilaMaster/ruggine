@@ -10,7 +10,7 @@ pub struct User {
     pub password_hash: String,
 }
 
-#[derive(Queryable, Debug, Identifiable)]
+#[derive(Queryable, Debug, Identifiable, Serialize)]
 #[diesel(table_name = groups)]
 pub struct Group {
     pub id: Option<i32>,

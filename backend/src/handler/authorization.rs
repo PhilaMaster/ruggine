@@ -1,10 +1,9 @@
 pub mod authorization{
-
     use actix_web::{web, HttpMessage, HttpRequest, HttpResponse, Result};
     use crate::utility::user::user::CreateUserRequest;
     use std::env;
     use std::time::{SystemTime, UNIX_EPOCH};
-    use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey};
+    use jsonwebtoken::{encode, Header, EncodingKey};
     use crate::utility::authorization::authorization::{authenticate_user, Claims};
     use crate::utility::connection::establish_connection;
 
