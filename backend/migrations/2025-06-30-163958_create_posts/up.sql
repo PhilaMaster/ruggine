@@ -54,4 +54,20 @@ CREATE TABLE group_message (
                                    ON DELETE CASCADE
 );
 
+CREATE TABLE group_invitation (
+                                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                 group_id INTEGER NOT NULL,
+                                 sender_id INTEGER NOT NULL,
+                                 receiver_id INTEGER NOT NULL,
+                                 FOREIGN KEY (group_id) REFERENCES groups(id)
+                                     ON UPDATE CASCADE
+                                     ON DELETE CASCADE,
+                                 FOREIGN KEY (sender_id) REFERENCES users(id)
+                                     ON UPDATE CASCADE
+                                     ON DELETE CASCADE,
+                                 FOREIGN KEY (receiver_id) REFERENCES users(id)
+                                     ON UPDATE CASCADE
+                                     ON DELETE CASCADE
+);
+
 
