@@ -16,8 +16,13 @@ class AuthRepo{
     }
     try {
       await _apiClient.login(username, password).then((response) {
+        if (kDebugMode) {
+          print("Login successful, response: ${response.data}");
+        }
         final token = response.data['token'];
         SecureStorage.writeToken(token);
+      }).catchError((error) {
+        throw Exception("Login failed");
       });
     }on DioException catch (err) {
       if (kDebugMode) {
@@ -26,6 +31,9 @@ class AuthRepo{
       return err.response?.data['error'];
     }
     catch (e) {
+      if (kDebugMode) {
+        print("An unexpected error occurred: ${e.toString()}");
+      }
       return "An unexpected error occurred: $e";
     }
     return null;

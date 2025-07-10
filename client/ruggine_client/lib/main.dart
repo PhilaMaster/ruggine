@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,18 +21,20 @@ class MyApp extends ConsumerWidget {
     final isLoggedIn = ref.watch(authProvider);
 
     final router = GoRouter(
-      initialLocation: '/',
-      redirect: (context, state) {
-        print(state.uri.toString());
-        if (!isLoggedIn && state.uri.toString() != '/login') return '/login';
-        if (isLoggedIn && state.uri.toString() == '/login') return '/';
-        return null;
-      },
-      routes: [
-        GoRoute(path: '/', builder: (_, __) => HomePage()),
-        GoRoute(path: route_home, builder: (_, __) => HomePage()),
-        GoRoute(path: route_login, builder: (_, __) => LoginPage()),
-      ],
+        initialLocation: '/',
+        redirect: (context, state) {
+          if (kDebugMode) {
+            print("ai"+ state.uri.toString());
+          }
+          if (!isLoggedIn && state.uri.toString() != '/login') return '/login';
+          if (isLoggedIn && state.uri.toString() != '/') return '/';
+          if (!isLoggedIn) return '/login';
+        },
+        routes: [
+          GoRoute(path: '/', builder: (_, __) => HomePage()),
+          GoRoute(path: route_home, builder: (_, __) => HomePage()),
+          GoRoute(path: route_login, builder: (_, __) => LoginPage()),
+        ]
     );
 
     return MaterialApp.router(
