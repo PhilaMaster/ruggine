@@ -1,6 +1,15 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    group_invitation (id) {
+        id -> Integer,
+        group_id -> Integer,
+        sender_id -> Integer,
+        receiver_id -> Integer,
+    }
+}
+
+diesel::table! {
     group_message (id) {
         id -> Integer,
         text -> Text,
@@ -42,15 +51,18 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(group_invitation -> groups (group_id));
 diesel::joinable!(group_message -> groups (group_rx_id));
 diesel::joinable!(group_message -> users (sender_id));
 diesel::joinable!(user_in_group -> groups (group_id));
 diesel::joinable!(user_in_group -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    group_invitation,
     group_message,
     groups,
     private_message,
     user_in_group,
     users,
 );
+

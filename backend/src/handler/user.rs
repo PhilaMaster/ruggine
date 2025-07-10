@@ -1,10 +1,10 @@
 pub mod user{
     use actix_web::{web, HttpResponse};
     use crate::utility::connection::establish_connection;
-    use crate::utility::user::user::{create_user, get_all_users, hash_password, CreateUserRequest, UserResponse};
+    use crate::utility::user::user::{create_user, get_all_users, hash_password, UserRequest, UserResponse};
     
     // API Endpoints
-    pub(crate) async fn create_user_handler(user_data: web::Json<CreateUserRequest>) -> actix_web::Result<HttpResponse> {
+    pub(crate) async fn create_user_handler(user_data: web::Json<UserRequest>) -> actix_web::Result<HttpResponse> {
         let mut conn = establish_connection();
 
         let password_hash = hash_password(user_data.password.as_str()).expect("Failed to hash password");

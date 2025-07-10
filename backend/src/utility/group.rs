@@ -20,24 +20,31 @@ pub mod group {
 
     pub fn create_group(conn: &mut SqliteConnection, user_id: i32, name: String) -> QueryResult<Group> {
         let new_group = NewGroup { name };
-        
+
         diesel::insert_into(groups::table)
             .values(&new_group)
             .execute(conn)?;
-        
+
         let group = groups::table
             .order_by(groups::id.desc())
             .first::<Group>(conn).unwrap();
-        
+
         diesel::insert_into(user_in_group::table)
             .values((user_in_group::group_id.eq(group.id.unwrap()), user_in_group::user_id.eq(user_id)))
             .execute(conn)?;
-        
+
         groups::table
             .order_by(groups::id.desc())
             .first::<Group>(conn)
     }
-    
+
+    pub(crate) fn get_group_by_name(conn: &mut SqliteConnection, group_name: String) -> QueryResult<Group> {
+        use crate::schema::groups::dsl::*;
+        groups.filter(name.eq(group_name))
+            .first::<Group>(conn)
+            .map_err(|_| diesel::result::Error::NotFound)
+    }
+
     #[derive(Deserialize, Clone, Debug)]
     pub(crate) struct CreateGroupRequest {
         pub(crate) name: String,
@@ -48,5 +55,5 @@ pub mod group {
     pub struct NewGroup {
         pub name: String,
     }
-    
+
 }
