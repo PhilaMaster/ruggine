@@ -1,8 +1,7 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    group_invitation (id) {
-        id -> Integer,
+    group_invitation (group_id, sender_id, receiver_id) {
         group_id -> Integer,
         sender_id -> Integer,
         receiver_id -> Integer,
@@ -65,4 +64,3 @@ diesel::allow_tables_to_appear_in_same_query!(
     user_in_group,
     users,
 );
-

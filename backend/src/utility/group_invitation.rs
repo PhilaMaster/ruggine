@@ -30,7 +30,7 @@ pub(crate) mod group_invitation {
         group_id: i32,
         sender_id: i32,
         receiver_id: i32,
-    ) -> QueryResult<GroupInvitation> {
+    ) -> QueryResult<()> {
         let new_invitation = NewGroupInvitation {
             group_id,
             sender_id,
@@ -47,9 +47,7 @@ pub(crate) mod group_invitation {
             .values(&new_invitation)
             .execute(conn)?;
 
-        group_invitation::table
-            .order_by(group_invitation::id.desc())
-            .first::<GroupInvitation>(conn)
+        Ok(())
     }
 
     pub fn delete_group_invitation(

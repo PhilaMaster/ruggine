@@ -27,7 +27,7 @@ pub mod authorization{
             })))
             }
             Err(_) => {
-                Ok(HttpResponse::InternalServerError().json(serde_json::json!({
+                Ok(HttpResponse::ImATeapot().json(serde_json::json!({
                 "error": "Failed to authenticate user"
             })))
             }

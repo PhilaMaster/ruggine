@@ -1,5 +1,5 @@
-mod schema;
-mod models;
+pub(crate) mod schema;
+pub(crate) mod models;
 
 mod middleware{
     pub mod authentication_middleware;
