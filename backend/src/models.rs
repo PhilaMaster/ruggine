@@ -17,7 +17,7 @@ pub struct GroupInvitation {
     pub receiver_id: i32,
 }
 
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = group_message)]
 pub struct GroupMessage {
     pub id: i32,

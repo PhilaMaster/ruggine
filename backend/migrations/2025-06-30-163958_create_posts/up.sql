@@ -41,7 +41,7 @@ CREATE TABLE private_message (
 );
 
 CREATE TABLE group_message (
-                               id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                               id INTEGER PRIMARY KEY AUTOINCREMENT,
                                text TEXT NOT NULL,
                                sender_id INTEGER NOT NULL,
                                group_rx_id INTEGER NOT NULL,
