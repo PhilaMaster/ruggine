@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ruggine_client/UI/providers/message_service.dart';
+import 'package:ruggine_client/exceptions/exceptions.dart';
 import '../providers/auth_provider.dart';
 
 class LoginPage extends ConsumerWidget {
@@ -27,16 +28,13 @@ class LoginPage extends ConsumerWidget {
                 await auth.login(
                   _emailController.text,
                   _passwordController.text,
-                )
-                //     .then((err) {
-                //   if (err == null) {
-                //     MessageService.show("Login successful");
-                //     Navigator.pushReplacementNamed(context, '/');
-                //   } else {
-                //     MessageService.show(err);
-                //   }
-                // })
-                ;
+                ).catchError((e){
+                  if (e is LoginException) {
+                    MessageService.show(e.toString());
+                  } else {
+                    MessageService.show("An unexpected error occurred");
+                  }
+                });
               },
               child: Text("Login"),
             ),

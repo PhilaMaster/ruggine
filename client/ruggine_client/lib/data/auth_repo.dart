@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:ruggine_client/exceptions/exceptions.dart';
 
 import '../models/user.dart';
 import 'api_client.dart';
@@ -31,16 +33,28 @@ class AuthRepo{
     }
 
     String? token;
-    await _apiClient.login(username, password).then((response) {
-      if (response.statusCode != 200) {
-        throw Exception('Login failed with status code: ${response.statusCode}');
+    try {
+      await _apiClient.login(username, password).then((response) {
+        if (response.statusCode != 200) {
+          throw Exception(
+              'Login failed with status code: ${response.statusCode}');
+        }
+        token = response.data['token'];
+        SecureStorage.writeToken(token!);
+      });
+    }catch (e) {
+      if (e is DioException) {
+        if (kDebugMode) {
+          print("DioException during login: ${e.message}");
+        }
+        throw LoginException('Login failed: ${e.response?.data['error'] ?? 'Unknown error'}');
       }
-      token = response.data['token'];
-      SecureStorage.writeToken(token!);
-    });
-
+      if (kDebugMode) {
+        print("Exception during login: $e");
+      }
+      throw LoginException('Login failed unexpectedly');
+    }
     if (token == null) throw Exception('Token non trovato');
-
     // Decodifica JWT per ottenere username e id
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     final userId = decodedToken['user_id']?.toString() ?? '';

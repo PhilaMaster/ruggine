@@ -7,6 +7,7 @@ import 'UI/pages/home_page.dart';
 import 'UI/pages/login_page.dart';
 import 'UI/pages/settings.dart';
 import 'UI/providers/auth_provider.dart';
+import 'UI/providers/message_service.dart';
 import 'UI/providers/theme_provider.dart';
 
 void main() {
@@ -41,6 +42,7 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Ruggine Chat',
       routerConfig: router,
+      scaffoldMessengerKey: MessageService.messengerKey,
       theme: ThemeData.light(useMaterial3: true),
       darkTheme: ThemeData.dark(useMaterial3: true),
       themeMode: themeMode,

@@ -25,12 +25,8 @@ class AuthNotifier extends StateNotifier<User?> {
   }
 
   Future<void> login(String username, String password) async {
-    try {
-      final user = await repo.login(username, password);
-      state = user;
-    } catch (e) {
-      throw Exception('Login failed: $e');
-    }
+    final user = await repo.login(username, password);
+    state = user;
   }
 
   Future<void> logout() async {
