@@ -11,20 +11,13 @@ import 'UI/providers/auth_provider.dart';
 import 'UI/providers/message_service.dart';
 import 'UI/providers/theme_provider.dart';
 
-void main() {
-  runApp(ProviderScope(child: MyApp()));
-}
+final routerProvider = Provider<GoRouter>((ref) {
+  final auth = ref.watch(authProvider);
+  final isLoggedIn = auth != null;
 
-class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
-
-  static final GoRouter _router = GoRouter(
+  return GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
-      final container = ProviderScope.containerOf(context);
-      final user = container.read(authProvider);
-      final isLoggedIn = user != null;
-
       if (kDebugMode) {
         print(state.uri.toString());
       }
@@ -40,14 +33,23 @@ class MyApp extends ConsumerWidget {
       GoRoute(path: '/settings', builder: (_, __) => const SettingsPage()),
     ],
   );
+});
+
+void main() {
+  runApp(ProviderScope(child: MyApp()));
+}
+
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeNotifierProvider);
+    final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
       title: 'Ruggine Chat',
-      routerConfig: _router,
+      routerConfig: router,
       scaffoldMessengerKey: MessageService.messengerKey,
       theme: ThemeData.light(useMaterial3: true),
       darkTheme: ThemeData.dark(useMaterial3: true),
