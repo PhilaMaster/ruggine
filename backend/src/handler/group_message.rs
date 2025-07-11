@@ -40,7 +40,14 @@ pub mod group_message{
                     Ok(HttpResponse::Ok().json(messages))
                 },
                 Err(e) => {
-                    Err(actix_web::error::ErrorInternalServerError(format!("Database error: {}", e)))
+                    match e {
+                        diesel::result::Error::NotFound => {
+                            Ok(HttpResponse::Forbidden().body("L'utente non fa parte del gruppo"))
+                        },
+                        _ => {
+                            Err(actix_web::error::ErrorInternalServerError(format!("Database error: {}", e)))
+                        }
+                    }
                 }
             }
 
@@ -72,7 +79,14 @@ pub mod group_message{
                     Ok(HttpResponse::Created().finish())
                 },
                 Err(e) => {
-                    Err(actix_web::error::ErrorInternalServerError(format!("Database error: {}", e)))
+                    match e {
+                        diesel::result::Error::NotFound => {
+                            Ok(HttpResponse::Forbidden().body("L'utente non fa parte del gruppo"))
+                        },
+                        _ => {
+                            Err(actix_web::error::ErrorInternalServerError(format!("Database error: {}", e)))
+                        }
+                    }
                 }
             }
         } else {

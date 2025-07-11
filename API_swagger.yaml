@@ -134,13 +134,13 @@ paths:
             schema:
               type: object
               required:
-                - invited_user_id
-                - group_id
+                - group_name
+                - receiver_username
               properties:
-                group_id:
-                  type: integer
-                invited_user_id:
-                  type: integer
+                group_name:
+                  type: string
+                receiver_username:
+                  type: string
                   
       responses:
         '201':
@@ -200,7 +200,7 @@ paths:
         '404':
           description: Invito non trovato
 
-  /groupsMessages/{group_id}:
+  /groupsMessages:
     get:
       tags:
         - Group Messages
@@ -208,11 +208,11 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: group_id
-          in: path
+        - name: group_name
+          in: query
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: Lista dei messaggi del gruppo
@@ -233,12 +233,6 @@ paths:
       summary: Invia un messaggio al gruppo
       security:
         - bearerAuth: []
-      parameters:
-        - name: group_id
-          in: path
-          required: true
-          schema:
-            type: integer
       requestBody:
         required: true
         content:
@@ -246,17 +240,16 @@ paths:
             schema:
               type: object
               required:
+                - group_name
                 - text
               properties:
+                group_name:
+                  type: string
                 text:
                   type: string
       responses:
         '201':
           description: Messaggio inviato
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GroupMessage'
         '401':
           description: Token non valido
         '403':
