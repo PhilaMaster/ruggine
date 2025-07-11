@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,31 +18,36 @@ void main() {
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
+  static final GoRouter _router = GoRouter(
+    initialLocation: '/',
+    redirect: (context, state) {
+      final container = ProviderScope.containerOf(context);
+      final user = container.read(authProvider);
+      final isLoggedIn = user != null;
+
+      if (kDebugMode) {
+        print(state.uri.toString());
+      }
+      final location = state.uri.toString();
+      if (!isLoggedIn && location != '/login') return '/login';
+      if (isLoggedIn && location == '/login') return '/';
+      return null;
+    },
+    routes: [
+      GoRoute(path: '/', builder: (_, __) => HomePage()),
+      GoRoute(path: route_home, builder: (_, __) => HomePage()),
+      GoRoute(path: route_login, builder: (_, __) => LoginPage()),
+      GoRoute(path: '/settings', builder: (_, __) => const SettingsPage()),
+    ],
+  );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authProvider);
-    final isLoggedIn = user != null;
     final themeMode = ref.watch(themeNotifierProvider);
-
-    final router = GoRouter(
-      initialLocation: '/',
-      redirect: (context, state) {
-        print(state.uri.toString());
-        if (!isLoggedIn && state.uri.toString() != '/login') return '/login';
-        if (isLoggedIn && state.uri.toString() == '/login') return '/';
-        return null;
-      },
-      routes: [
-        GoRoute(path: '/', builder: (_, __) => HomePage()),
-        GoRoute(path: route_home, builder: (_, __) => HomePage()),
-        GoRoute(path: route_login, builder: (_, __) => LoginPage()),
-        GoRoute(path: '/settings', builder: (_, __) => const SettingsPage()),
-      ],
-    );
 
     return MaterialApp.router(
       title: 'Ruggine Chat',
-      routerConfig: router,
+      routerConfig: _router,
       scaffoldMessengerKey: MessageService.messengerKey,
       theme: ThemeData.light(useMaterial3: true),
       darkTheme: ThemeData.dark(useMaterial3: true),
