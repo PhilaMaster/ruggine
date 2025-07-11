@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ruggine_client/UI/pages/settings.dart';
 import '../providers/auth_provider.dart';
 
 
@@ -30,6 +32,12 @@ class HomePage extends ConsumerWidget {
       appBar: AppBar(
         title: Text("Test page logged in"),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              context.push('/settings');
+            },
+          ),
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () {
