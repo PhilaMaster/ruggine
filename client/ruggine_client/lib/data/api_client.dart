@@ -45,4 +45,27 @@ class ApiClient {
   Future<Response> getUser() {
     return dio.get(apipath_user);
   }
+
+  Future<Response> getChats() {
+    //for now return fake chats
+    return Future<Response<dynamic>>.value(
+      Response(
+        requestOptions: RequestOptions(path: 'path chats'),
+        data: [
+          {
+            'id': '1',
+            'lastSender': 'Reba',
+            'lastMessage': 'Hello from Reba',
+            'lastTime': DateTime.now().toIso8601String(),
+          },
+          {
+            'id': '2',
+            'lastSender': 'John',
+            'lastMessage': 'Hello from John',
+            'lastTime': DateTime.now().subtract(Duration(minutes: 5)).toIso8601String(),
+          },
+        ],
+      ),
+    );
+  }
 }

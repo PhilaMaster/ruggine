@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ruggine_client/UI/pages/settings.dart';
+import '../../models/chat.dart';
+import '../../models/invite.dart';
 import '../providers/auth_provider.dart';
+import '../providers/chats_provider.dart';
 
 
 
@@ -35,24 +38,7 @@ final stateProvider = StateNotifierProvider<HomePageStateNotifier, _HomePageStat
   return HomePageStateNotifier();
 });
 
-class MockChat {
-  final String id;
-  final String lastSender;
-  final String lastMessage;
-  final DateTime lastTime;
 
-  MockChat({
-    required this.id,
-    required this.lastSender,
-    required this.lastMessage,
-    required this.lastTime,
-  });
-}
-
-class MockInvite {
-  final String groupName;
-  MockInvite({required this.groupName});
-}
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -60,32 +46,13 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authProvider.notifier);
+    final chats = ref.watch(chatProvider);
     // final num = ref.watch(stateProvider.select((state) => state.number));
 
     // MOCK DATI
     final mockInvites = [
       MockInvite(groupName: "Gruppo Rust"),
       MockInvite(groupName: "Flutter Devs"),
-    ];
-    final mockChats = [
-      MockChat(
-        id: "1",
-        lastSender: "Alice",
-        lastMessage: "Ciao!",
-        lastTime: DateTime.now().subtract(Duration(minutes: 2)),
-      ),
-      MockChat(
-        id: "2",
-        lastSender: "Bob",
-        lastMessage: "Hai visto il nuovo update?",
-        lastTime: DateTime.now().subtract(Duration(hours: 1, minutes: 15)),
-      ),
-      MockChat(
-        id: "3",
-        lastSender: "Sandro",
-        lastMessage: "Cumanandro, un fottuto professore volante",
-        lastTime: DateTime.now().subtract(Duration(days: 1, hours: 3)),
-      ),
     ];
 
     // Responsive: larghezza massima su desktop/tablet
@@ -107,6 +74,17 @@ class HomePage extends ConsumerWidget {
             onPressed: () {
               auth.logout();
             },
+          ),
+          IconButton(
+              onPressed: () => ref.read(chatProvider.notifier).addChat(
+                      Chat(
+                        id: ((chats?.length ?? 0) + 1).toString(),
+                        lastSender: "Reba McEntire",
+                        lastMessage: "Messaggio di prova",
+                        lastTime: DateTime.now(),
+                      )
+                  ),
+              icon: Icon(Icons.add_circle_outline)
           )
         ],
       ),
@@ -172,11 +150,11 @@ class HomePage extends ConsumerWidget {
                       showDialog(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          title: Text("Inviti"),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: mockInvites
-                                .map((invite) => ListTile(
+                              title: Text("Inviti"),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: mockInvites
+                                    .map((invite) => ListTile(
                                       leading: Icon(Icons.group),
                                       title: Text(invite.groupName),
                                       trailing: Row(
@@ -208,15 +186,15 @@ class HomePage extends ConsumerWidget {
                                         ],
                                       ),
                                     ))
-                                .toList(),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(ctx).pop(),
-                              child: Text("Chiudi"),
+                                    .toList(),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(),
+                                  child: Text("Chiudi"),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
                       );
                     },
                   ),
@@ -224,61 +202,67 @@ class HomePage extends ConsumerWidget {
                 SizedBox(height: 24),
                 // Lista chat
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: mockChats.length,
-                    itemBuilder: (context, index) {
-                      final chat = mockChats[index];
-                      String formattedTime = TimeOfDay.fromDateTime(chat.lastTime).format(context);
-                      return Center(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: maxWidth),
-                          child: Card(
-                            child: ListTile(
-                              title: Text("Chat #${chat.id}"),
-                              subtitle: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "${chat.lastSender}: ${chat.lastMessage}",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    formattedTime,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              isThreeLine: false,
-                              onTap: () {
-                                // Mock: mostra dialog chat
-                                showDialog(
-                                  context: context,
-                                  builder: (ctx) => AlertDialog(
-                                    title: Text("Chat #${chat.id}"),
-                                    content: Text(
-                                      "Ultimo messaggio da ${chat.lastSender} alle $formattedTime:\n${chat.lastMessage}\n\nQuesto dovrebbe aprire la relativa chat e caricare i messaggi"
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.of(ctx).pop(),
-                                        child: Text("Chiudi"),
+                    child: chats == null
+                        ? const Center(child: CircularProgressIndicator())
+                        : chats.isEmpty
+                        ? const Center(child: Text("Nessuna chat disponibile"))
+                        : ListView.builder(
+                      itemCount: chats.length,
+                      itemBuilder: (context, index) {
+                        final chat = chats[index];
+                        String formattedTime = TimeOfDay.fromDateTime(chat.lastTime).format(context);
+                        return Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: maxWidth),
+                            child: Card(
+                              child: ListTile(
+                                title: Text("Chat #${chat.id}"),
+                                subtitle: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "${chat.lastSender}: ${chat.lastMessage}",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ],
-                                  ),
-                                );
-                              },
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      formattedTime,
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    IconButton(onPressed: () =>
+                                        ref.read(chatProvider.notifier).removeChat(chat.id),
+                                        icon: Icon(Icons.delete, color: Colors.red)),
+                                  ],
+                                ),
+                                isThreeLine: false,
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                          title: Text("Chat #${chat.id}"),
+                                          content: Text(
+                                              "Ultimo messaggio da ${chat.lastSender} alle $formattedTime:\n${chat.lastMessage}\n\nQuesto dovrebbe aprire la relativa chat e caricare i messaggi"
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.of(ctx).pop(),
+                                              child: Text("Chiudi"),
+                                            ),
+                                          ],
+                                        ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    )
                 ),
               ],
             ),
@@ -288,10 +272,10 @@ class HomePage extends ConsumerWidget {
       floatingActionButton: isWide
           ? null
           : FloatingActionButton(
-              onPressed: () => handleCreateGroup(context),
-              tooltip: 'Crea gruppo',
-              child: Icon(Icons.group_add),
-            ),
+        onPressed: () => handleCreateGroup(context),
+        tooltip: 'Crea gruppo',
+        child: Icon(Icons.group_add),
+      ),
     );
   }
 
@@ -299,15 +283,15 @@ class HomePage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text("Crea gruppo"),
-        content: Text("Zio pera!"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text("OK"),
+            title: Text("Crea gruppo"),
+            content: Text("Zio pera!"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text("OK"),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

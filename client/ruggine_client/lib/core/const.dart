@@ -12,4 +12,8 @@ const String route_login = "/login";
 const String route_home = "/";
 
 // Secure Storage Keys
+const String kHivePath = 'hive_path';
 const String kJwtTokenKey = 'jwt_token';
+const String kChatsBox = 'chats_box';
+const String kInvitesBox = 'invites_box';
+const String kMessagesBox = 'messages_box';

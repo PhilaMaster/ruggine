@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:ruggine_client/exceptions/exceptions.dart';
-
 import '../models/user.dart';
 import 'api_client.dart';
 import '../core/storage.dart';

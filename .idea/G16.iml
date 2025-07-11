@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/backend/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/backend/target" />
       <excludeFolder url="file://$MODULE_DIR$/client/ruggine_client/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/client/ruggine_client/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/client/ruggine_client/build" />
       <excludeFolder url="file://$MODULE_DIR$/client/ruggine_client/ios/Flutter/ephemeral" />
       <excludeFolder url="file://$MODULE_DIR$/client/ruggine_client/linux/flutter/ephemeral" />
