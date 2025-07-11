@@ -1,13 +1,13 @@
 pub mod authorization{
     use actix_web::{web, HttpMessage, HttpRequest, HttpResponse, Result};
-    use crate::utility::user::user::CreateUserRequest;
+    use crate::utility::user::user::UserRequest;
     use std::env;
     use std::time::{SystemTime, UNIX_EPOCH};
     use jsonwebtoken::{encode, Header, EncodingKey};
     use crate::utility::authorization::authorization::{authenticate_user, Claims};
     use crate::utility::connection::establish_connection;
 
-    pub(crate) async fn login_handler(user_data: web::Json<CreateUserRequest>) -> Result<HttpResponse> {
+    pub(crate) async fn login_handler(user_data: web::Json<UserRequest>) -> Result<HttpResponse> {
         let mut conn = establish_connection();
 
         match authenticate_user(&mut conn, user_data.username.as_str(), user_data.password.as_str()) {
@@ -27,7 +27,7 @@ pub mod authorization{
             })))
             }
             Err(_) => {
-                Ok(HttpResponse::InternalServerError().json(serde_json::json!({
+                Ok(HttpResponse::ImATeapot().json(serde_json::json!({
                 "error": "Failed to authenticate user"
             })))
             }

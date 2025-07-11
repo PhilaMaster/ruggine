@@ -41,7 +41,7 @@ CREATE TABLE private_message (
 );
 
 CREATE TABLE group_message (
-                               id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                               id INTEGER PRIMARY KEY AUTOINCREMENT,
                                text TEXT NOT NULL,
                                sender_id INTEGER NOT NULL,
                                group_rx_id INTEGER NOT NULL,
@@ -52,6 +52,22 @@ CREATE TABLE group_message (
                                FOREIGN KEY (group_rx_id) REFERENCES groups(id)
                                    ON UPDATE CASCADE
                                    ON DELETE CASCADE
+);
+
+CREATE TABLE group_invitation (
+                                 group_id INTEGER NOT NULL,
+                                 sender_id INTEGER NOT NULL,
+                                 receiver_id INTEGER NOT NULL,
+                                 PRIMARY KEY (group_id, sender_id, receiver_id),
+                                 FOREIGN KEY (group_id) REFERENCES groups(id)
+                                     ON UPDATE CASCADE
+                                     ON DELETE CASCADE,
+                                 FOREIGN KEY (sender_id) REFERENCES users(id)
+                                     ON UPDATE CASCADE
+                                     ON DELETE CASCADE,
+                                 FOREIGN KEY (receiver_id) REFERENCES users(id)
+                                     ON UPDATE CASCADE
+                                     ON DELETE CASCADE
 );
 
 
