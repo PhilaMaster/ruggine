@@ -61,9 +61,9 @@ pub mod user{
         }
     }
 
-    pub(crate) fn get_user_by_username(conn: &mut SqliteConnection, username: &str) -> QueryResult<User> {
+    pub(crate) fn get_user_by_username(conn: &mut SqliteConnection, user: &str) -> QueryResult<User> {
         use crate::schema::users::dsl::*;
-        users.filter(username.eq(username)).first::<User>(conn)
+        users.filter(username.eq(user)).first::<User>(conn)
     }
 
     pub fn create_user(conn: &mut SqliteConnection, username: &str, password_hash: &str) -> QueryResult<User> {

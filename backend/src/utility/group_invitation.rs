@@ -52,5 +52,18 @@ pub(crate) mod group_invitation {
             .first::<GroupInvitation>(conn)
     }
 
+    pub fn delete_group_invitation(
+        conn: &mut SqliteConnection,
+        group_id: i32,
+        sender_id: i32,
+        receiver_id: i32,
+    ) -> QueryResult<usize> {
+        diesel::delete(group_invitation::table)
+            .filter(group_invitation::group_id.eq(group_id))
+            .filter(group_invitation::sender_id.eq(sender_id))
+            .filter(group_invitation::receiver_id.eq(receiver_id))
+            .execute(conn)
+    }
+
 
 }

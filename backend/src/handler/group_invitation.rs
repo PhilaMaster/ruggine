@@ -27,6 +27,7 @@ pub mod group_invitation {
         let mut conn = establish_connection();
 
         let rec_username = invitation_data.receiver_username.clone();
+
         let rec_user_id = match get_user_by_username(&mut conn, &rec_username) {
             Ok(user) => user.id,
             Err(_) => {
@@ -46,12 +47,32 @@ pub mod group_invitation {
                 return Ok(HttpResponse::NotFound().json(format!("Group {} not found", &group_name)));
             }
         };
-
         // richiede login, quindi serve ottenere i claims
         if let Some(claims) = req.extensions().get::<Claims>() {
             match create_group_invitation(&mut conn, group_id, claims.user_id, rec_user_id) {
                 Ok(invitation) => {
-                    Ok(HttpResponse::Created().json(invitation))
+                    Ok(HttpResponse::Created().finish())
+                },
+                Err(e) => {
+                    Err(actix_web::error::ErrorInternalServerError(format!("Database error: {}", e)))
+                }
+            }
+        } else {
+            Ok(HttpResponse::Unauthorized().body("Claims not found"))
+        }
+    }
+
+    pub(crate) async fn delete_group_invitation_handler(req: HttpRequest) -> actix_web::Result<HttpResponse> {
+        let mut conn = establish_connection();
+        // richiede login, quindi serve ottenere i claims
+        if let Some(claims) = req.extensions().get::<Claims>() {
+            let group_id: i32 = req.match_info().get("group_id").unwrap_or("0").parse().unwrap_or(0);
+            let sender_id: i32 = claims.user_id;
+            let receiver_id: i32 = req.match_info().get("receiver_id").unwrap_or("0").parse().unwrap_or(0);
+
+            match crate::utility::group_invitation::group_invitation::delete_group_invitation(&mut conn, group_id, sender_id, receiver_id) {
+                Ok(_) => {
+                    Ok(HttpResponse::NoContent().finish())
                 },
                 Err(e) => {
                     Err(actix_web::error::ErrorInternalServerError(format!("Database error: {}", e)))

@@ -34,7 +34,7 @@ use crate::handler::user::user::{create_user_handler, get_users_handler};
 use crate::middleware::authentication_middleware::AuthMiddleware;
 use crate::handler::private_messages::private_messages::{get_private_messages_handler, send_private_message_handler};
 use crate::handler::group::group::{get_all_groups_of_a_user_handler, create_group_handler};
-use crate::handler::group_invitation::group_invitation::{create_group_invitation_handler, get_user_group_invitations_handler};
+use crate::handler::group_invitation::group_invitation::{create_group_invitation_handler, delete_group_invitation_handler, get_user_group_invitations_handler};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -61,6 +61,7 @@ async fn main() -> std::io::Result<()> {
                             .route("/groups", web::post().to(create_group_handler))
                             .route("/groupInvites", web::get().to(get_user_group_invitations_handler))
                             .route("/groupInvites", web::post().to(create_group_invitation_handler))
+                            .route("/groupInvites", web::delete().to(delete_group_invitation_handler))
                     )
             )
     })
