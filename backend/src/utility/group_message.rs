@@ -20,10 +20,10 @@ pub mod group_message{
     }
 
     // controlla che un utente sia membro di un dato gruppo
-    fn is_user_in_group(conn: &mut SqliteConnection, user_id: i32, group_id: i32) -> QueryResult<bool> {
+    fn is_user_in_group(conn: &mut SqliteConnection, req_user_id: i32, req_group_id: i32) -> QueryResult<bool> {
         use crate::schema::user_in_group::dsl::*;
         let exists = user_in_group
-            .filter(user_id.eq(user_id).and(group_id.eq(group_id)))
+            .filter(user_id.eq(req_user_id).and(group_id.eq(req_group_id)))
             .select(user_id)
             .first::<i32>(conn)
             .optional()?;
