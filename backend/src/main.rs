@@ -61,7 +61,7 @@ async fn main() -> std::io::Result<()> {
                             .route("/privateMessages", web::get().to(get_private_messages_handler))
                             .route("/privateMessages", web::post().to(send_private_message_handler))
                             .route("/groupMessages", web::get().to(get_all_group_messages_handler))
-                            .route("groupMessages", web::post().to(send_group_message_handler))
+                            .route("/groupMessages", web::post().to(send_group_message_handler))
                             .route("/groups", web::get().to(get_all_groups_of_a_user_handler))
                             .route("/groups", web::post().to(create_group_handler))
                             .route("/groupInvites", web::get().to(get_user_group_invitations_handler))
