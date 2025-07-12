@@ -22,7 +22,15 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
   final ChatsRepo _repo;
 
   ChatsNotifier(this._repo) : super(null) {
-    _loadLocalChats();
+    _loadLocalChats().then((_) {
+      if (state != null && state!.isNotEmpty) {
+        // Load new chats excluding those already in state
+        loadNewChats(state!.map((chat) => chat.id).toList());
+      } else {
+        // If no local chats, just load new chats
+        loadNewChats([]);
+      }
+    });
   }
 
   List<Chat> sortChats(List<Chat> chats) {
@@ -54,10 +62,11 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     }
   }
 
-  Future<void> loadNewChats() async {
+  Future<void> loadNewChats(List<String> excludedIds) async {
     try {
-      final newChats = await _repo.getNewChats();
+      var newChats = await _repo.getNewChats();
       if (newChats.isNotEmpty) {
+        newChats = newChats.where((chat) => !excludedIds.contains(chat.id)).toList();
         await _repo.saveChats(newChats);
         state = sortChats([...?state, ...newChats]);
       } else {

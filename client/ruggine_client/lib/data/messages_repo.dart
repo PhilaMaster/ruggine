@@ -25,9 +25,6 @@ class ChatsRepo {
   Future<List<Chat>> getNewChats() async {
     try {
       final response = await _apiClient.getChats();
-      if (response.statusCode != 200) {
-        throw Exception('Failed to load chats: ${response.statusCode}');
-      }
       // Assuming the response data is a list of chat objects
       return (response.data as List).map((chat) => Chat.fromJson(chat)).toList();
     } catch (e) {

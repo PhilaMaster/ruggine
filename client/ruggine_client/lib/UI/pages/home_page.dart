@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ruggine_client/UI/providers/invites_provider.dart';
 import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
 import '../../models/chat.dart';
 import '../../models/invite.dart';
@@ -45,13 +46,8 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chats = ref.watch(chatProvider);
+    final invites = ref.watch(invitesProvider);
     // final num = ref.watch(stateProvider.select((state) => state.number));
-
-    // MOCK DATI
-    final mockInvites = [
-      MockInvite(groupName: "Gruppo Rust"),
-      MockInvite(groupName: "Flutter Devs"),
-    ];
 
     // Responsive: larghezza massima su desktop/tablet
     final isWide = MediaQuery.of(context).size.width > 600;
@@ -77,6 +73,22 @@ class HomePage extends ConsumerWidget {
                   ):null,
                 ),
                 SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: isWide?
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.send_sharp),
+                    label: Text("Ricevi falso invito da Zio Pera"),
+                    onPressed: () => ref.read(invitesProvider.notifier).receiveInvite(
+                          Invite(
+                            groupName: "Gruppo di Zio Pera",
+                            id: "fake-invite-id",
+                            senderName: 'Zio Pera',
+                          ),
+                        ),
+                  ):null,
+                ),
+                SizedBox(height: 12),
                 // Pulsante inviti con badge numerico
                 SizedBox(
                   width: double.infinity,
@@ -84,7 +96,7 @@ class HomePage extends ConsumerWidget {
                     icon: Stack(
                       children: [
                         Icon(Icons.mail),
-                        if (mockInvites.isNotEmpty)
+                        if (invites != null && invites.isNotEmpty)
                           Positioned(
                             right: -2,
                             top: -2,
@@ -99,7 +111,7 @@ class HomePage extends ConsumerWidget {
                                 minHeight: 18,
                               ),
                               child: Text(
-                                '${mockInvites.length}',
+                                '${invites.length}',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -113,58 +125,80 @@ class HomePage extends ConsumerWidget {
                     ),
                     label: Text("Inviti"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: mockInvites.isNotEmpty ? Colors.red.shade100 : null,
-                      foregroundColor: mockInvites.isNotEmpty ? Colors.red.shade900 : null,
+                      backgroundColor: (invites != null && invites!.isNotEmpty)
+                          ? Colors.red.shade100
+                          : Colors.grey.shade200,
+                      foregroundColor: (invites != null && invites!.isNotEmpty)
+                          ? Colors.red.shade900
+                          : Colors.grey.shade600,
                     ),
                     onPressed: () {
                       // Mock: mostra pagina inviti
                       showDialog(
                         context: context,
-                        builder: (ctx) => AlertDialog(
-                              title: Text("Inviti"),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: mockInvites
-                                    .map((invite) => ListTile(
-                                      leading: Icon(Icons.group),
-                                      title: Text(invite.groupName),
-                                      trailing: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          ElevatedButton(
-                                            child: Text("Accetta"),
-                                            onPressed: () {
-                                              Navigator.of(ctx).pop();
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text("Invito accettato per ${invite.groupName} (ovviamente non è vero)")),
-                                              );
-                                            },
+                        builder: (ctx) => Consumer(
+                              builder: (context, ref, child) {
+                                final dialogInvites = ref.watch(invitesProvider);
+                                return AlertDialog(
+                                  title: Text("Inviti"),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: dialogInvites != null && dialogInvites.isNotEmpty
+                                        ? dialogInvites
+                                        .map((invite) => ListTile(
+                                          leading: Icon(Icons.group),
+                                          title: Text(invite.groupName),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ElevatedButton(
+                                                child: Text("Accetta"),
+                                                onPressed: () {
+                                                  ref.read(invitesProvider.notifier).acceptInvite(invite.id);
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text("Invito accettato per ${invite.groupName}")),
+                                                  );
+                                                },
+                                              ),
+                                              SizedBox(width: 8),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.grey.shade300,
+                                                  foregroundColor: Colors.black,
+                                                ),
+                                                child: Text("Rifiuta"),
+                                                onPressed: () {
+                                                  ref.read(invitesProvider.notifier).declineInvite(invite.id);
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text("Invito rifiutato per ${invite.groupName}")),
+                                                  );
+                                                },
+                                              ),
+                                            ],
                                           ),
-                                          SizedBox(width: 8),
-                                          ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.grey.shade300,
-                                              foregroundColor: Colors.black,
-                                            ),
-                                            child: Text("Rifiuta"),
-                                            onPressed: () {
-                                              Navigator.of(ctx).pop();
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text("Invito rifiutato per ${invite.groupName} (ovviamente non è vero)")),
-                                              );
-                                            },
+                                        ))
+                                        .toList()
+                                        : [
+                                      Padding(
+                                        padding: EdgeInsets.all(16.0),
+                                        child: Text(
+                                          "Nessun invito disponibile",
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 16,
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ))
-                                    .toList(),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(ctx).pop(),
-                                  child: Text("Chiudi"),
-                                ),
-                              ],
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: Text("Chiudi"),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                       );
                     },
@@ -275,3 +309,4 @@ class HomePage extends ConsumerWidget {
     );
   }
 }
+

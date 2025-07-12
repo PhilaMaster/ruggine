@@ -68,4 +68,64 @@ class ApiClient {
       ),
     );
   }
+
+  Future<Response> getInvites() {
+    //for now return fake invites
+    return Future<Response<dynamic>>.value(
+      Response(
+        requestOptions: RequestOptions(path: 'path invites'),
+        data: [
+          {
+            'groupName': 'The Sussoni',
+            'id': '1',
+            'senderName': 'Reba',
+          },
+          {
+            'groupName': 'The Cumarans',
+            'id': '2',
+            'senderName': 'Sandro',
+          },
+        ],
+      ),
+    );
+  }
+
+  Future<Response> acceptInvite(String inviteId) {
+    // Simulate accepting an invite
+    if (kDebugMode) {
+      print("Accepting invite: $inviteId");
+    }
+    return Future<Response<dynamic>>.value(
+      Response(
+        requestOptions: RequestOptions(path: 'path accept invite'),
+        data: {'status': 'accepted', 'inviteId': inviteId},
+      ),
+    );
+  }
+
+  Future<Response> declineInvite(String inviteId) {
+    // Simulate declining an invite
+    if (kDebugMode) {
+      print("Declining invite: $inviteId");
+    }
+    return Future<Response<dynamic>>.value(
+      Response(
+        requestOptions: RequestOptions(path: 'path decline invite'),
+        data: {'status': 'declined', 'inviteId': inviteId},
+      ),
+    );
+  }
+
+  Future<Response> sendInvite(String groupName) {
+    // Simulate sending an invite
+    if (kDebugMode) {
+      print("Sending invite to group: $groupName");
+    }
+    return Future<Response<dynamic>>.value(
+      Response(
+        requestOptions: RequestOptions(path: 'path send invite'),
+        data: {'status': 'sent', 'groupName': groupName},
+      ),
+    );
+  }
 }
