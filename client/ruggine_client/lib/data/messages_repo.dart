@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import '../core/storage.dart';
 import '../models/chat.dart';
+import '../models/message.dart';
 import 'api_client.dart';
 
 class ChatsRepo {
@@ -68,6 +69,54 @@ class ChatsRepo {
       }
     } catch (e) {
       throw Exception('Error removing chat: $e');
+    }
+  }
+}
+
+
+class MessagesRepo {
+  late final ApiClient _apiClient;
+
+  MessagesRepo(this._apiClient);
+
+
+  Future<List<Message>> getLocalMessages(String chatId) async {
+    try {
+      final messages = await LocalData.getStoredMessages(chatId);
+      if (kDebugMode) {
+        print("Retrieved ${messages.length} messages for chat $chatId from local storage.");
+      }
+      return messages;
+    } catch (e) {
+      throw Exception('Error fetching local messages: $e');
+    }
+  }
+
+  Future<List<Message>> getMessages(String chatId) async {
+    try {
+      final response = await _apiClient.getMessages(chatId);
+      final msgs = (response.data as List).map((msg) => Message.fromJson(msg)).toList();
+      msgs.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      if (kDebugMode) {
+        print("Retrieved ${msgs} messages for chat $chatId from API.");
+      }
+      return msgs;
+    } catch (e) {
+      throw Exception('Error fetching messages: $e');
+    }
+  }
+
+  Future<Message> sendMessage(String chatId, String content) async {
+    try {
+      final res = await _apiClient.sendMessage(chatId, content);
+      if (kDebugMode) {
+        print("Message sent: ${content}");
+      }
+      final newMessage = Message.fromJson(res.data);
+      await LocalData.saveMessage(chatId, newMessage);
+      return newMessage;
+    } catch (e) {
+      throw Exception('Error sending message: $e');
     }
   }
 }

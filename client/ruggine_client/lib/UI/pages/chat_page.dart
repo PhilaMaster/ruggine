@@ -5,6 +5,9 @@ import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
 import 'package:ruggine_client/models/chat.dart';
 import 'package:ruggine_client/models/message.dart';
 
+import '../providers/auth_provider.dart';
+import '../providers/messages_provider.dart';
+
 class ChatPage extends ConsumerStatefulWidget {
   final Chat chat;
 
@@ -17,40 +20,12 @@ class ChatPage extends ConsumerStatefulWidget {
 class _ChatPageState extends ConsumerState<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  late List<Message> messages;
-
-  // For demo purposes, using a hardcoded current user ID
-  // TODO: Replace with actual user provider when implementing real messaging
-  final String currentUserId = "current_user_123";
+  bool _isInitializing = true;
 
   @override
   void initState() {
     super.initState();
-    // TODO: Replace with actual message provider
-    _initializeMockMessages();
-  }
-
-  void _initializeMockMessages() {
-    messages = [
-      Message(
-        id: '1',
-        senderId: widget.chat.lastSender,
-        content: 'Hello, how are you?',
-        timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-      ),
-      Message(
-        id: '2',
-        senderId: currentUserId,
-        content: 'I am fine, thank you! How about you?',
-        timestamp: DateTime.now().subtract(const Duration(minutes: 3)),
-      ),
-      Message(
-        id: '3',
-        senderId: widget.chat.lastSender,
-        content: 'Great! I wanted to discuss the project with you.',
-        timestamp: DateTime.now().subtract(const Duration(minutes: 1)),
-      ),
-    ];
+    _initMessages();
   }
 
   @override
@@ -62,22 +37,12 @@ class _ChatPageState extends ConsumerState<ChatPage> {
 
   void _sendMessage() {
     if (_messageController.text.trim().isEmpty) return;
-
-    final newMessage = Message(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      senderId: currentUserId,
-      content: _messageController.text.trim(),
-      timestamp: DateTime.now(),
+    ref.read(msgProvider.notifier).sendMessage(
+      widget.chat.id.toString(),
+      _messageController.text.trim(),
     );
-
-    setState(() {
-      messages.add(newMessage);
-    });
-
     _messageController.clear();
     _scrollToBottom();
-
-    // TODO: Add message to provider and send to backend
   }
 
   void _scrollToBottom() {
@@ -92,8 +57,26 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     });
   }
 
+  Future<void> _initMessages() async {
+    try {
+      await ref.read(msgProvider.notifier).loadLocalMessages(widget.chat.id);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isInitializing = false;
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToBottom();
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final messages = ref.watch(msgProvider);
+    final currentUserName = ref.watch(authProvider)?.username ?? '';
+
     return Scaffold(
       appBar: buildRuggineAppBar(context, ref, widget.chat.lastSender),
       body: Column(
@@ -102,19 +85,32 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           Expanded(
             child: Container(
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
+              child: _isInitializing
+                  ? const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Loading messages...'),
+                  ],
+                ),
+              )
+                  : messages == null || messages.isEmpty
+                  ? const Center(child: Text('No messages yet'))
+                  : ListView.builder(
                 controller: _scrollController,
                 padding: const EdgeInsets.all(8.0),
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
                   final message = messages[index];
-                  final isCurrentUser = message.senderId == currentUserId;
+                  final isCurrentUser = message.senderName == currentUserName;
                   final isLastMessage = index == messages.length - 1;
 
                   return _buildMessageBubble(
-                    message,
-                    isCurrentUser,
-                    isLastMessage
+                      message,
+                      isCurrentUser,
+                      isLastMessage
                   );
                 },
               ),
@@ -149,7 +145,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           margin: EdgeInsets.zero,
           color: isCurrentUser
               ? colorScheme.primaryContainer
-              : colorScheme.surfaceVariant,
+              : colorScheme.surfaceContainerHighest,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(16.0),
@@ -168,7 +164,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4.0),
                     child: Text(
-                      message.senderId,
+                      message.senderName,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 12.0,
@@ -196,7 +192,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                       fontSize: 11.0,
                       color: (isCurrentUser
                           ? colorScheme.onPrimaryContainer
-                          : colorScheme.onSurfaceVariant).withOpacity(0.7),
+                          : colorScheme.onSurfaceVariant).withValues(alpha: 0.7),
                     ),
                   ),
                 ),
@@ -233,8 +229,8 @@ class _ChatPageState extends ConsumerState<ChatPage> {
         color: colorScheme.surface,
         border: Border(
           top: BorderSide(
-            color: colorScheme.outline.withOpacity(0.3),
-            width: 0.5
+              color: colorScheme.outline.withValues(alpha: 0.3),
+              width: 0.5
           ),
         ),
       ),
@@ -244,21 +240,30 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: colorScheme.surfaceVariant,
+                color: _isInitializing
+                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                    : colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(25.0),
                 border: Border.all(
-                  color: colorScheme.outline.withOpacity(0.5),
+                  color: _isInitializing
+                      ? colorScheme.outline.withValues(alpha: 0.3)
+                      : colorScheme.outline.withValues(alpha: 0.5),
                 ),
               ),
               child: TextField(
                 controller: _messageController,
+                enabled: !_isInitializing,
                 style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
+                  color: _isInitializing
+                      ? colorScheme.onSurfaceVariant.withValues(alpha: 0.4)
+                      : colorScheme.onSurfaceVariant,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Type a message...',
+                  hintText: _isInitializing
+                      ? 'Loading chat...'
+                      : 'Type a message...',
                   hintStyle: TextStyle(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                   ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
@@ -267,7 +272,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                   ),
                 ),
                 textCapitalization: TextCapitalization.sentences,
-                onSubmitted: (_) => _sendMessage(),
+                onSubmitted: _isInitializing ? null : (_) => _sendMessage(),
                 maxLines: null,
               ),
             ),
@@ -276,14 +281,18 @@ class _ChatPageState extends ConsumerState<ChatPage> {
           // Send button
           Container(
             decoration: BoxDecoration(
-              color: colorScheme.primary,
+              color: _isInitializing
+                  ? colorScheme.primary.withValues(alpha: 0.5)
+                  : colorScheme.primary,
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              onPressed: _sendMessage,
+              onPressed: _isInitializing ? null : _sendMessage,
               icon: Icon(
                 Icons.send,
-                color: colorScheme.onPrimary,
+                color: _isInitializing
+                    ? colorScheme.onPrimary.withValues(alpha: 0.5)
+                    : colorScheme.onPrimary,
                 size: 20.0,
               ),
               padding: const EdgeInsets.all(12.0),

@@ -14,6 +14,7 @@ import 'UI/providers/auth_provider.dart';
 import 'UI/providers/message_service.dart';
 import 'UI/providers/theme_provider.dart';
 import 'models/chat.dart';
+import 'models/message.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authProvider);
@@ -64,7 +65,6 @@ void main() async {
     WindowOptions windowOptions = const WindowOptions(
       size: Size(800, 600), // Default window size
       minimumSize: Size(400, 500), // Minimum window size
-      center: true,
       backgroundColor: Colors.transparent,
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
@@ -78,6 +78,7 @@ void main() async {
 
   await Hive.initFlutter();
   Hive.registerAdapter(ChatAdapter());
+  Hive.registerAdapter(MessageAdapter());
   runApp(ProviderScope(child: MyApp()));
 }
 
