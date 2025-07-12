@@ -58,7 +58,7 @@ class HomePage extends ConsumerWidget {
     final maxWidth = isWide ? 500.0 : double.infinity;
 
     return Scaffold(
-      appBar: buildRuggineAppBar(context, ref),
+      appBar: buildRuggineAppBar(context, ref), //ruggine appbar
       body: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
@@ -73,7 +73,7 @@ class HomePage extends ConsumerWidget {
                   ElevatedButton.icon(
                     icon: Icon(Icons.group_add),
                     label: Text("Crea gruppo"),
-                    onPressed: () => handleCreateGroup(context),
+                    onPressed: () => handleCreateGroup(context, ref),
                   ):null,
                 ),
                 SizedBox(height: 12),
@@ -180,7 +180,7 @@ class HomePage extends ConsumerWidget {
                         : ListView.builder(
                       itemCount: chats.length,
                       itemBuilder: (context, index) {
-                        final chat = chats[index];
+                        final chat = chats.elementAt(index);
                         String formattedTime = TimeOfDay.fromDateTime(chat.lastTime).format(context);
                         return Center(
                           child: ConstrainedBox(
@@ -243,14 +243,23 @@ class HomePage extends ConsumerWidget {
       floatingActionButton: isWide
           ? null
           : FloatingActionButton(
-        onPressed: () => handleCreateGroup(context),
+        onPressed: () => handleCreateGroup(context, ref),
         tooltip: 'Crea gruppo',
         child: Icon(Icons.group_add),
       ),
     );
   }
 
-  void handleCreateGroup(BuildContext context) {
+  void handleCreateGroup(BuildContext context, WidgetRef ref) {
+    final chatz = ref.read(chatProvider.notifier);
+    chatz.addChat(
+      Chat(
+        id: (chatz.length + 1).toString(),
+        lastSender: "Zio Pera",
+        lastMessage: "Ciao, questo è un messaggio di prova!",
+        lastTime: DateTime.now(),
+      ),
+    );
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

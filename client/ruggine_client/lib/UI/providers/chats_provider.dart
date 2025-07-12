@@ -17,11 +17,16 @@ final chatProvider = StateNotifierProvider<ChatsNotifier, List<Chat>?>((ref) {
 
 
 
+//mantains order of chats
 class ChatsNotifier extends StateNotifier<List<Chat>?> {
   final ChatsRepo _repo;
 
   ChatsNotifier(this._repo) : super(null) {
     _loadLocalChats();
+  }
+
+  List<Chat> sortChats(List<Chat> chats) {
+    return chats..sort((a, b) => b.lastTime.compareTo(a.lastTime));
   }
 
   int get length => state?.length ?? 0;
@@ -37,7 +42,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     try {
       final chats = await _repo.getLocalChats();
       if (chats.isNotEmpty) {
-        state = chats;
+        state = sortChats(chats);
       } else {
         state = [];
       }
@@ -54,7 +59,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
       final newChats = await _repo.getNewChats();
       if (newChats.isNotEmpty) {
         await _repo.saveChats(newChats);
-        state = [...?state, ...newChats];
+        state = sortChats([...?state, ...newChats]);
       } else {
         if (kDebugMode) {
           print("No new chats found.");
@@ -72,7 +77,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     if (state == null) {
       state = [chat];
     } else {
-      state = [...?state, chat];
+      state = sortChats([...?state, chat]);
     }
   }
 
