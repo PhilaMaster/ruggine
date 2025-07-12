@@ -15,7 +15,7 @@ class ChatsRepo {
     try {
       final chats = await LocalData.getStoredChats();
       if (kDebugMode) {
-        print("Retrieved ${chats.length} chats from local storage.");
+        print("Repo_Chat| Retrieved ${chats.length} chats from local storage.");
       }
       return chats;
     } catch (e) {
@@ -37,7 +37,7 @@ class ChatsRepo {
     try {
       await LocalData.saveChats(chats);
       if (kDebugMode) {
-        print("All chats saved locally.");
+        print("Repo_Chat| All chats saved locally.");
       }
     } catch (e) {
       throw Exception('Error saving chats: $e');
@@ -69,6 +69,17 @@ class ChatsRepo {
       }
     } catch (e) {
       throw Exception('Error removing chat: $e');
+    }
+  }
+
+  Future<void> resetUnreadCount(String chatId) async {
+    try {
+      await LocalData.resetUnreadCount(chatId);
+      if (kDebugMode) {
+        print("Repo| Unread count reset for chat: $chatId");
+      }
+    } catch (e) {
+      throw Exception('Error resetting unread count: $e');
     }
   }
 }

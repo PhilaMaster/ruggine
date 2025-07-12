@@ -27,31 +27,22 @@ class LocalData{
   static Future<List<Chat>> getStoredChats() async {
     final box = await Hive.openBox<Chat>(kChatsBox);
     if (kDebugMode) {
-      print("Retrieved ${box.length} chats from local storage.");
+      print("Storage| Retrieved ${box.length} chats from local storage.");
     }
     return box.values.toList();
   }
 
-  static Future<void> saveChatIfNotExists(Chat chat) async {
+  static Future<void> saveChat(Chat chat) async {
     final box = await Hive.openBox<Chat>(kChatsBox);
-    if (!box.containsKey(chat.id)) {
-      await box.put(chat.id, chat);
-      if (kDebugMode) {
-        print("Chat salvata: ${chat.id}");
-      }
-    } else {
-      if (kDebugMode) {
-        print("Chat già presente: ${chat.id}");
-      }
+    await box.put(chat.id, chat);
+    if (kDebugMode) {
+      print("Storage| Chat salvata: ${chat.id}");
     }
   }
 
   static Future<void> saveChats(List<Chat> chats) async {
     for (var chat in chats) {
-      await saveChatIfNotExists(chat);
-    }
-    if (kDebugMode) {
-      print("Tutte le chat salvate localmente.");
+      await saveChat(chat);
     }
   }
 
@@ -91,6 +82,28 @@ class LocalData{
     await box.add(message);
     if (kDebugMode) {
       print("Message saved: ${message.id} for chat $chatId");
+    }
+  }
+
+  static Future<void> resetUnreadCount(String chatId) async {
+    final box = await Hive.openBox<Chat>(kChatsBox);
+    if (box.containsKey(chatId)) {
+      final chat = box.get(chatId);
+      if (chat != null) {
+        chat.newMessages = 0; // Reset unread count
+        await box.put(chatId, chat);
+        if (kDebugMode) {
+          print("Storage| Unread count reset for chat: $chatId");
+        }
+      } else {
+        if (kDebugMode) {
+          print("Chat not found: $chatId");
+        }
+      }
+    } else {
+      if (kDebugMode) {
+        print("Chat not found in local storage: $chatId");
+      }
     }
   }
 

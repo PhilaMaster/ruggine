@@ -26,7 +26,7 @@ class Message {
       'id': id,
       'content': content,
       'timestamp': timestamp.toIso8601String(),
-      'senderId': senderName,
+      'senderName': senderName,
     };
   }
 
@@ -38,4 +38,20 @@ class Message {
       senderName: json['senderName'] ?? 'Unknown Sender',
     );
   }
+
+  @override
+  toString() {
+    return 'Message(id: $id, content: $content, timestamp: $timestamp, senderName: $senderName)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Message &&
+        other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
 }

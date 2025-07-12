@@ -137,13 +137,13 @@ class ApiClient {
         data: [
           {
             'id': '1',
-            'senderId': 'Reba',
+            'senderName': 'Reba',
             'content': 'Hello, how are you?',
             'timestamp': DateTime.now().subtract(const Duration(minutes: 5)).toIso8601String(),
           },
           {
             'id': '2',
-            'senderId': 'John',
+            'senderName': 'John',
             'content': 'I am fine, thank you! How about you?',
             'timestamp': DateTime.now().subtract(const Duration(minutes: 3)).toIso8601String(),
           },
@@ -161,7 +161,7 @@ class ApiClient {
       Response(
         requestOptions: RequestOptions(path: 'path send message'),
         data: {
-          'id' : 3,
+          'id' : '3',
           'senderName': 'pasquale', // Replace with actual user name
           'content': content,
           'timestamp': DateTime.now().toIso8601String(),

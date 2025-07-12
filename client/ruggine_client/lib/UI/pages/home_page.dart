@@ -262,61 +262,97 @@ class HomePage extends ConsumerWidget {
                               minHeight: 72, // Minimum acceptable height
                             ),
                             child: Card(
-                              child: ListTile(
-                                title: Text("Chat #${chat.id}"),
-                                subtitle: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    minHeight: 20, // Minimum height for subtitle
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 3, // Give more space to message text
-                                        child: Text(
-                                          "${chat.lastSender}: ${chat.lastMessage}",
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                              child: Stack(
+                                children: [
+                                  // Main ListTile content
+                                  ListTile(
+                                    contentPadding: EdgeInsets.fromLTRB(16, 8, 60, 8), // Extra right padding for counter
+                                    title: Text("Chat #${chat.id}"),
+                                    subtitle: ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        minHeight: 20, // Minimum height for subtitle
                                       ),
-                                      SizedBox(width: 4), // Reduced spacing
-                                      Container(
-                                        constraints: BoxConstraints(
-                                          minWidth: 45, // Minimum width for time
-                                          maxWidth: 60, // Maximum width for time
-                                        ),
-                                        child: Text(
-                                          formattedTime,
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 12, // Slightly smaller font
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              chat.lastMessage == null
+                                                  ? "No messages yet"
+                                                  :
+                                              "${chat.lastSender}: ${chat.lastMessage}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
-                                          textAlign: TextAlign.end,
+                                          SizedBox(width: 8),
+                                          Text(
+                                            formattedTime,
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    isThreeLine: false,
+                                    onTap: () {
+                                      context.push('/chat/${chat.id}', extra: chat);
+                                    },
+                                  ),
+                                  // Delete button in top-right corner
+                                  Positioned(
+                                    top: 4,
+                                    right: 4,
+                                    child: Container(
+                                      width: 24,
+                                      height: 24,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.withValues(alpha: 0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () =>
+                                            ref.read(chatProvider.notifier).removeChat(chat.id),
+                                        icon: Icon(Icons.close, color: Colors.red, size: 14),
+                                        padding: EdgeInsets.zero,
+                                        constraints: BoxConstraints(
+                                          minWidth: 24,
+                                          minHeight: 24,
                                         ),
                                       ),
-                                      SizedBox(width: 2), // Minimal spacing
-                                      Container(
-                                        constraints: BoxConstraints(
-                                          minWidth: 40, // Fixed width for icon button
-                                          maxWidth: 40,
-                                        ),
-                                        child: IconButton(
-                                          onPressed: () =>
-                                              ref.read(chatProvider.notifier).removeChat(chat.id),
-                                          icon: Icon(Icons.delete, color: Colors.red, size: 20),
-                                          padding: EdgeInsets.all(4), // Reduced padding
+                                    ),
+                                  ),
+                                  // New message counter in center-right
+                                  if (chat.newMessages > 0)
+                                    Positioned(
+                                      right: 8,
+                                      top: 0,
+                                      bottom: 0,
+                                      child: Center(
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).colorScheme.primary,
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
                                           constraints: BoxConstraints(
-                                            minWidth: 32,
-                                            minHeight: 32,
+                                            minWidth: 24,
+                                            minHeight: 20,
+                                          ),
+                                          child: Text(
+                                            chat.newMessages > 99 ? '99+' : chat.newMessages.toString(),
+                                            style: TextStyle(
+                                              color: Theme.of(context).colorScheme.onPrimary,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                isThreeLine: false,
-                                onTap: () {
-                                  context.push('/chat/${chat.id}', extra: chat);
-                                },
+                                    ),
+                                ],
                               ),
                             ),
                           ),
@@ -347,6 +383,7 @@ class HomePage extends ConsumerWidget {
         lastSender: "Zio Pera",
         lastMessage: "Ciao, questo è un messaggio di prova!",
         lastTime: DateTime.now(),
+        newMessages: 10,
       ),
     );
     showDialog(

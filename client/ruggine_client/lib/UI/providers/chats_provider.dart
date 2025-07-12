@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ruggine_client/data/messages_repo.dart';
 import 'package:ruggine_client/models/chat.dart';
+import 'package:ruggine_client/models/message.dart';
 
 import '../../data/api_client.dart';
 
@@ -99,6 +100,52 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     } catch (e) {
       if (kDebugMode) {
         print("Error removing chat: $e");
+      }
+    }
+  }
+
+  Future<void> resetUnreadCount(String chatId) async {
+    try {
+      await _repo.resetUnreadCount(chatId);
+      if (state != null) {
+        final index = state!.indexWhere((chat) => chat.id == chatId);
+        if (index != -1) {
+          final updatedChat = state![index].copyWith(id: chatId, newMessages: 0);
+          state![index] = updatedChat;
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error resetting unread count: $e");
+      }
+    }
+  }
+  
+  Future<void> updateLastMessage(String chatId, Message? msg) async {
+    try {
+      if (state != null) {
+        final index = state!.indexWhere((chat) => chat.id == chatId);
+        if (index != -1) {
+          if (msg == null) {
+            state![index]= state![index].copyWith(
+              id: chatId,
+              lastMessage: null
+            );
+          }else{
+              state![index]= state![index].copyWith(
+              id: chatId,
+              lastSender: msg.senderName,
+              lastMessage: msg.content,
+              lastTime: msg.timestamp,
+            );
+          }
+          state = sortChats(state!);
+          await _repo.saveChats([state![index]]);
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error updating last message: $e");
       }
     }
   }

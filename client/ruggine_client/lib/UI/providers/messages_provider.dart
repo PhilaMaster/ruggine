@@ -7,14 +7,16 @@ import 'package:ruggine_client/models/chat.dart';
 
 import '../../data/api_client.dart';
 import '../../models/message.dart';
+import 'chats_provider.dart';
 
 final messageRepositoryProvider = Provider<MessagesRepo>((ref) {
   return MessagesRepo(ApiClient());
 });
 
-final msgProvider = StateNotifierProvider<MessagesNotifier, List<Message>?>((ref) {
+final msgProvider = StateNotifierProvider<MessagesNotifier, List<Message>?>((ref){
   final repo = ref.read(messageRepositoryProvider);
-  return (MessagesNotifier(repo));
+  final chatNotifier = ref.read(chatProvider.notifier);
+  return (MessagesNotifier(repo, chatNotifier));
 });
 
 
@@ -22,9 +24,10 @@ final msgProvider = StateNotifierProvider<MessagesNotifier, List<Message>?>((ref
 //mantains order of chats
 class MessagesNotifier extends StateNotifier<List<Message>?> {
   final MessagesRepo _repo;
+  final ChatsNotifier _chatNotifier;
+  String? _chatId;
 
-  MessagesNotifier(this._repo) : super(null) {}
-
+  MessagesNotifier(this._repo, this._chatNotifier) : super(null) {}
 
   int get length => state?.length ?? 0;
 
@@ -35,12 +38,34 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
     return state![index];
   }
 
+  List<Message> sortMessages(List<Message> messages) {
+    // Remove duplicates by ID and sort by timestamp in descending order
+    final uniqueMessages = messages.toSet().toList();
+    uniqueMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return uniqueMessages;
+  }
+
   Future<void> loadMessages(String chatId) async {
     try {
+      if (_chatId != null && _chatId != chatId) {
+        // Reset state if the chat ID changes
+        state = [];
+      }
+      _chatId = chatId; // Update the current chat ID
       final messages = await _repo.getMessages(chatId);
+
       if (messages.isNotEmpty) {
-        state = messages;
-      } else {
+        final lastMessage = messages.last;
+        // If state is null, initialize it with the messages
+        if (state != null) {
+          state = sortMessages([...?state, ...messages]);
+        } else {
+          state = messages;
+        }
+        if (lastMessage == state?.last) {
+          await _chatNotifier.updateLastMessage(chatId, lastMessage);
+        }
+      } else if (state == null) {
         state = [];
       }
     } catch (e) {
@@ -52,11 +77,13 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
   Future<void> sendMessage(String chatId, String content) async {
     try {
       final mex = await _repo.sendMessage(chatId, content);
+      await _chatNotifier.updateLastMessage(chatId, mex);
       if (state == null) {
         state = [mex];
       } else {
         state = [...?state, mex];
       }
+
     } catch (e) {
       if (kDebugMode) {
         print("Error adding message: $e");
@@ -68,16 +95,42 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
     // Simulate delay without blocking the UI thread
     //await Future.delayed(Duration(seconds: 5));
     try {
+      if (_chatId != null && _chatId != chatId) {
+        // Reset state if the chat ID changes
+        state = [];
+      }
+      if (_chatId == chatId) {
+        // If the chat ID is the same, no need to reload from local storage
+        return;
+      }
+      _chatId = chatId; // Update the current chat ID
       final messages = await _repo.getLocalMessages(chatId);
+      // Update the chat's last message if messages exist
       if (messages.isNotEmpty) {
-        state = messages;
-      } else {
+        final lastMessage = messages.last;
+        await _chatNotifier.updateLastMessage(chatId, lastMessage);
+        // If state is null, initialize it with the messages
+        if (state != null) {
+          state = [...?state, ...messages];
+        } else {
+          state = messages;
+        }
+      } else if (state == null) {
         state = [];
       }
     } catch (e) {
       if (kDebugMode) {
         print("Error loading local messages: $e");
       }
+    }
+  }
+
+
+
+  Future<void> resetState(String id) async {
+    state = [];
+    if (kDebugMode) {
+      print("Messages of chat $id state reset.");
     }
   }
 

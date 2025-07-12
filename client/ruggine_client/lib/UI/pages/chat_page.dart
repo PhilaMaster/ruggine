@@ -6,6 +6,7 @@ import 'package:ruggine_client/models/chat.dart';
 import 'package:ruggine_client/models/message.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/chats_provider.dart';
 import '../providers/messages_provider.dart';
 
 class ChatPage extends ConsumerStatefulWidget {
@@ -58,18 +59,25 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   }
 
   Future<void> _initMessages() async {
-    try {
-      await ref.read(msgProvider.notifier).loadLocalMessages(widget.chat.id);
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isInitializing = false;
-        });
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _scrollToBottom();
-        });
+    // Delay provider modifications until after the widget tree is built
+    Future(() async {
+      final msgRepo = ref.read(msgProvider.notifier);
+      try {
+        // Remove the resetState call - let loadLocalMessages handle the state
+        await msgRepo.loadLocalMessages(widget.chat.id);
+        await msgRepo.loadMessages(widget.chat.id);
+      } finally {
+        ref.read(chatProvider.notifier).resetUnreadCount(widget.chat.id);
+        if (mounted) {
+          setState(() {
+            _isInitializing = false;
+          });
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _scrollToBottom();
+          });
+        }
       }
-    }
+    });
   }
 
   @override
