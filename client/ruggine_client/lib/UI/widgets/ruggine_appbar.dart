@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 
-PreferredSizeWidget buildRuggineAppBar(BuildContext context, WidgetRef ref) {
+PreferredSizeWidget buildRuggineAppBar(BuildContext context, WidgetRef ref, String title) {
   final auth = ref.watch(authProvider.notifier);
   return AppBar(
-    title: const Text("Home"),
+    title: Text(title),
     actions: [
       IconButton(
         icon: const Icon(Icons.settings),

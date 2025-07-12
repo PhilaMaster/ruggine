@@ -54,7 +54,7 @@ class HomePage extends ConsumerWidget {
     final maxWidth = isWide ? 500.0 : double.infinity;
 
     return Scaffold(
-      appBar: buildRuggineAppBar(context, ref), //ruggine appbar
+      appBar: buildRuggineAppBar(context, ref, "Home"), //ruggine appbar
       body: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),
@@ -141,55 +141,94 @@ class HomePage extends ConsumerWidget {
                                 final dialogInvites = ref.watch(invitesProvider);
                                 return AlertDialog(
                                   title: Text("Inviti"),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: dialogInvites != null && dialogInvites.isNotEmpty
-                                        ? dialogInvites
-                                        .map((invite) => ListTile(
-                                          leading: Icon(Icons.group),
-                                          title: Text(invite.groupName),
-                                          trailing: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              ElevatedButton(
-                                                child: Text("Accetta"),
-                                                onPressed: () {
-                                                  ref.read(invitesProvider.notifier).acceptInvite(invite.id);
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(content: Text("Invito accettato per ${invite.groupName}")),
-                                                  );
-                                                },
+                                  content: SizedBox(
+                                    width: double.maxFinite,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: dialogInvites != null && dialogInvites.isNotEmpty
+                                          ? dialogInvites
+                                          .map((invite) => Card(
+                                            margin: EdgeInsets.symmetric(vertical: 4.0),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(12.0),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(Icons.group, size: 20),
+                                                      SizedBox(width: 8),
+                                                      Expanded(
+                                                        child: Text(
+                                                          invite.groupName,
+                                                          style: TextStyle(
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 12),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    children: [
+                                                      ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Colors.green,
+                                                          foregroundColor: Colors.white,
+                                                          padding: EdgeInsets.symmetric(
+                                                            horizontal: 16,
+                                                            vertical: 8
+                                                          ),
+                                                        ),
+                                                        child: Text("Accetta"),
+                                                        onPressed: () {
+                                                          ref.read(invitesProvider.notifier).acceptInvite(invite.id);
+                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                            SnackBar(content: Text("Invito accettato per ${invite.groupName}")),
+                                                          );
+                                                        },
+                                                      ),
+                                                      SizedBox(width: 8),
+                                                      ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Colors.grey.shade300,
+                                                          foregroundColor: Colors.black,
+                                                          padding: EdgeInsets.symmetric(
+                                                            horizontal: 16,
+                                                            vertical: 8
+                                                          ),
+                                                        ),
+                                                        child: Text("Rifiuta"),
+                                                        onPressed: () {
+                                                          ref.read(invitesProvider.notifier).declineInvite(invite.id);
+                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                            SnackBar(content: Text("Invito rifiutato per ${invite.groupName}")),
+                                                          );
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
                                               ),
-                                              SizedBox(width: 8),
-                                              ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.grey.shade300,
-                                                  foregroundColor: Colors.black,
-                                                ),
-                                                child: Text("Rifiuta"),
-                                                onPressed: () {
-                                                  ref.read(invitesProvider.notifier).declineInvite(invite.id);
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(content: Text("Invito rifiutato per ${invite.groupName}")),
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ))
-                                        .toList()
-                                        : [
-                                      Padding(
-                                        padding: EdgeInsets.all(16.0),
-                                        child: Text(
-                                          "Nessun invito disponibile",
-                                          style: TextStyle(
-                                            color: Colors.grey.shade600,
-                                            fontSize: 16,
+                                            ),
+                                          ))
+                                          .toList()
+                                          : [
+                                        Padding(
+                                          padding: EdgeInsets.all(16.0),
+                                          child: Text(
+                                            "Nessun invito disponibile",
+                                            style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontSize: 16,
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                   actions: [
                                     TextButton(
@@ -218,49 +257,65 @@ class HomePage extends ConsumerWidget {
                         String formattedTime = TimeOfDay.fromDateTime(chat.lastTime).format(context);
                         return Center(
                           child: ConstrainedBox(
-                            constraints: BoxConstraints(maxWidth: maxWidth),
+                            constraints: BoxConstraints(
+                              maxWidth: maxWidth,
+                              minHeight: 72, // Minimum acceptable height
+                            ),
                             child: Card(
                               child: ListTile(
                                 title: Text("Chat #${chat.id}"),
-                                subtitle: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "${chat.lastSender}: ${chat.lastMessage}",
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                subtitle: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minHeight: 20, // Minimum height for subtitle
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 3, // Give more space to message text
+                                        child: Text(
+                                          "${chat.lastSender}: ${chat.lastMessage}",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      formattedTime,
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 13,
+                                      SizedBox(width: 4), // Reduced spacing
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          minWidth: 45, // Minimum width for time
+                                          maxWidth: 60, // Maximum width for time
+                                        ),
+                                        child: Text(
+                                          formattedTime,
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12, // Slightly smaller font
+                                          ),
+                                          textAlign: TextAlign.end,
+                                        ),
                                       ),
-                                    ),
-                                    IconButton(onPressed: () =>
-                                        ref.read(chatProvider.notifier).removeChat(chat.id),
-                                        icon: Icon(Icons.delete, color: Colors.red)),
-                                  ],
+                                      SizedBox(width: 2), // Minimal spacing
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          minWidth: 40, // Fixed width for icon button
+                                          maxWidth: 40,
+                                        ),
+                                        child: IconButton(
+                                          onPressed: () =>
+                                              ref.read(chatProvider.notifier).removeChat(chat.id),
+                                          icon: Icon(Icons.delete, color: Colors.red, size: 20),
+                                          padding: EdgeInsets.all(4), // Reduced padding
+                                          constraints: BoxConstraints(
+                                            minWidth: 32,
+                                            minHeight: 32,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 isThreeLine: false,
                                 onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                          title: Text("Chat #${chat.id}"),
-                                          content: Text(
-                                              "Ultimo messaggio da ${chat.lastSender} alle $formattedTime:\n${chat.lastMessage}\n\nQuesto dovrebbe aprire la relativa chat e caricare i messaggi"
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.of(ctx).pop(),
-                                              child: Text("Chiudi"),
-                                            ),
-                                          ],
-                                        ),
-                                  );
+                                  context.push('/chat/${chat.id}', extra: chat);
                                 },
                               ),
                             ),
@@ -309,4 +364,3 @@ class HomePage extends ConsumerWidget {
     );
   }
 }
-
