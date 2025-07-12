@@ -1,7 +1,6 @@
 
 import 'package:flutter/foundation.dart';
 
-import '../UI/providers/chats_provider.dart';
 import '../core/storage.dart';
 import '../models/chat.dart';
 import 'api_client.dart';

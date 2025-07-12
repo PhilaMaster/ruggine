@@ -24,16 +24,16 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     _loadLocalChats();
   }
 
-  get length => state?.length ?? 0;
+  int get length => state?.length ?? 0;
 
-  getChat(int index) {
+  Chat? getChat(int index) {
     if (state == null || index < 0 || index >= state!.length) {
       return null;
     }
     return state![index];
   }
 
-  _loadLocalChats() async {
+  Future<void> _loadLocalChats() async {
     try {
       final chats = await _repo.getLocalChats();
       if (chats.isNotEmpty) {

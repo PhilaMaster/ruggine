@@ -1,8 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ruggine_client/UI/pages/settings.dart';
+import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
 import '../../models/chat.dart';
 import '../../models/invite.dart';
 import '../providers/auth_provider.dart';
@@ -45,7 +44,6 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authProvider.notifier);
     final chats = ref.watch(chatProvider);
     // final num = ref.watch(stateProvider.select((state) => state.number));
 
@@ -60,34 +58,7 @@ class HomePage extends ConsumerWidget {
     final maxWidth = isWide ? 500.0 : double.infinity;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Home"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              context.push('/settings');
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              auth.logout();
-            },
-          ),
-          IconButton(
-              onPressed: () => ref.read(chatProvider.notifier).addChat(
-                      Chat(
-                        id: ((chats?.length ?? 0) + 1).toString(),
-                        lastSender: "Reba McEntire",
-                        lastMessage: "Messaggio di prova",
-                        lastTime: DateTime.now(),
-                      )
-                  ),
-              icon: Icon(Icons.add_circle_outline)
-          )
-        ],
-      ),
+      appBar: buildRuggineAppBar(context, ref),
       body: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth),

@@ -3,7 +3,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
 import 'package:ruggine_client/core/const.dart';
 
-import '../UI/providers/chats_provider.dart';
 import '../models/chat.dart';
 
 class SecureStorage{
