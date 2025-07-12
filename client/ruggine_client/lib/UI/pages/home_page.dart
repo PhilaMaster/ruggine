@@ -5,7 +5,6 @@ import 'package:ruggine_client/UI/providers/invites_provider.dart';
 import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
 import '../../models/chat.dart';
 import '../../models/invite.dart';
-import '../providers/auth_provider.dart';
 import '../providers/chats_provider.dart';
 
 
@@ -125,10 +124,10 @@ class HomePage extends ConsumerWidget {
                     ),
                     label: Text("Inviti"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: (invites != null && invites!.isNotEmpty)
+                      backgroundColor: (invites != null && invites.isNotEmpty)
                           ? Colors.red.shade100
                           : Colors.grey.shade200,
-                      foregroundColor: (invites != null && invites!.isNotEmpty)
+                      foregroundColor: (invites != null && invites.isNotEmpty)
                           ? Colors.red.shade900
                           : Colors.grey.shade600,
                     ),

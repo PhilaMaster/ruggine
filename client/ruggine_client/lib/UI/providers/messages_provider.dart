@@ -1,10 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ruggine_client/data/messages_repo.dart';
-import 'package:ruggine_client/models/chat.dart';
-
 import '../../data/api_client.dart';
 import '../../models/message.dart';
 import 'chats_provider.dart';
