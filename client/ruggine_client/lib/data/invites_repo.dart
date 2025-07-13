@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:ruggine_client/models/invite.dart';
 
+import '../models/chat.dart';
 import 'api_client.dart';
 
 class InvitesRepo {
@@ -22,15 +23,17 @@ class InvitesRepo {
     }
   }
 
-  Future<void> acceptInvite(String inviteId) async {
+  Future<Chat> acceptInvite(String inviteId) async {
     try {
-      final response = await _apiClient.acceptInvite(inviteId);
+      final Chat response = Chat.fromJson((await _apiClient.acceptInvite(inviteId)).data);
       if (kDebugMode) {
         print("Invite accepted: $inviteId");
       }
+      return response;
     } catch (e) {
       throw Exception('Error accepting invite: $e');
     }
+
   }
 
   Future<void> declineInvite(String inviteId) async {

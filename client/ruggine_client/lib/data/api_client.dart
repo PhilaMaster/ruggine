@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:ruggine_client/models/chat.dart';
 import '../core/storage.dart';
 import '../core/const.dart';
 
@@ -95,10 +96,12 @@ class ApiClient {
     if (kDebugMode) {
       print("Accepting invite: $inviteId");
     }
+    //assume group info are returned
+    final chatInfo = Chat(id: '12345', lastSender: "ricevuto_da_invito", lastMessage: null, lastTime: DateTime.now());
     return Future<Response<dynamic>>.value(
       Response(
         requestOptions: RequestOptions(path: 'path accept invite'),
-        data: {'status': 'accepted', 'inviteId': inviteId},
+        data: chatInfo.toJson(),
       ),
     );
   }

@@ -2,6 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ruggine_client/UI/providers/chats_provider.dart';
 import 'package:ruggine_client/data/invites_repo.dart';
 
 import '../../data/api_client.dart';
@@ -13,7 +14,7 @@ final invitesRepositoryProvider = Provider<InvitesRepo>((ref) {
 
 final invitesProvider = StateNotifierProvider<InvitesNotifier, List<Invite>?>((ref) {
   final repo = ref.read(invitesRepositoryProvider);
-  return (InvitesNotifier(repo));
+  return (InvitesNotifier(repo, ref.read(chatProvider.notifier)));
 });
 
 
@@ -21,8 +22,9 @@ final invitesProvider = StateNotifierProvider<InvitesNotifier, List<Invite>?>((r
 //mantains order of chats
 class InvitesNotifier extends StateNotifier<List<Invite>?> {
   final InvitesRepo _repo;
+  final ChatsNotifier _chatsNotifier;
 
-  InvitesNotifier(this._repo) : super(null) {
+  InvitesNotifier(this._repo, this._chatsNotifier) : super(null) {
     loadInvites();
   }
 
@@ -75,11 +77,12 @@ class InvitesNotifier extends StateNotifier<List<Invite>?> {
 
   Future<void> acceptInvite(String inviteId) async {
     try {
-      await _repo.acceptInvite(inviteId);
+      final chatinfo = await _repo.acceptInvite(inviteId);
       if (kDebugMode) {
-        print("Invite accepted: $inviteId");
+        print("Invite accepted for: $chatinfo");
       }
       state = state?.where((invite) => invite.id != inviteId).toList();
+      _chatsNotifier.addChat(chatinfo);
     } catch (e) {
       if (kDebugMode) {
         print("Error accepting invite: $e");

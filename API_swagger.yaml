@@ -91,7 +91,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Group'
+              type: object
+              properties:
+                name: 
+                  type: string
       responses:
         '201':
           description: Gruppo creato
@@ -101,7 +104,8 @@ paths:
                 $ref: '#/components/schemas/Group'
         '401':
           description: Token mancante o non valido
-
+        '402':
+          description: Nome del gruppo già in uso
     get:
       tags:
         - Groups
@@ -120,6 +124,64 @@ paths:
         '401':
           description: Token mancante o non valido
 
+  /groups/addUser:
+    post:
+      tags:
+        - Groups
+      summary: aggiunge un utente al gruppo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                group_name: 
+                  type: string
+                
+      responses:
+        '201':
+          description: utente aggiunto correttamente
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Token mancante o non valido
+
+  /groups/removeUser:
+    post:
+      tags:
+        - Groups
+      summary: rimuove un utente da un gruppo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                group_name: 
+                  type: string
+                
+      responses:
+        '201':
+          description: utente aggiunto correttamente
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Token mancante o non valido
+        '403':
+          description: Utente non fa parte del gruppo
+        '404':
+          description: Gruppo non trovato
+
   /groupInvites:
     post:
       tags:
@@ -134,13 +196,13 @@ paths:
             schema:
               type: object
               required:
-                - invited_user_id
-                - group_id
+                - group_name
+                - receiver_username
               properties:
-                group_id:
-                  type: integer
-                invited_user_id:
-                  type: integer
+                group_name:
+                  type: string
+                receiver_username:
+                  type: string
                   
       responses:
         '201':
@@ -200,7 +262,7 @@ paths:
         '404':
           description: Invito non trovato
 
-  /groupsMessages/{group_id}:
+  /groupsMessages:
     get:
       tags:
         - Group Messages
@@ -208,11 +270,11 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: group_id
-          in: path
+        - name: group_name
+          in: query
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: Lista dei messaggi del gruppo
@@ -233,12 +295,6 @@ paths:
       summary: Invia un messaggio al gruppo
       security:
         - bearerAuth: []
-      parameters:
-        - name: group_id
-          in: path
-          required: true
-          schema:
-            type: integer
       requestBody:
         required: true
         content:
@@ -246,17 +302,16 @@ paths:
             schema:
               type: object
               required:
+                - group_name
                 - text
               properties:
+                group_name:
+                  type: string
                 text:
                   type: string
       responses:
         '201':
           description: Messaggio inviato
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GroupMessage'
         '401':
           description: Token non valido
         '403':
@@ -276,11 +331,11 @@ paths:
             schema:
               type: object
               required:
-                - receiver_id
+                - receiver_username
                 - text
               properties:
-                receiver_id:
-                  type: integer
+                receiver_username:
+                  type: string
                 text:
                   type: string
       responses:
@@ -292,6 +347,8 @@ paths:
                 $ref: '#/components/schemas/PrivateMessage'
         '401':
           description: Token non valido
+        '404':
+          description: Utente non trovato
     get:
       tags:
         - Private Messages

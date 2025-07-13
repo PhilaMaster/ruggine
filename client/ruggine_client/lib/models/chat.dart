@@ -36,7 +36,7 @@ class Chat {
     return Chat(
       id: json['id'] ?? '',
       lastSender: json['lastSender'] ?? '',
-      lastMessage: json['lastMessage'] ?? '',
+      lastMessage: json['lastMessage'],
       lastTime: DateTime.parse(json['lastTime'] ?? DateTime.now().toIso8601String()),
     );
   }
