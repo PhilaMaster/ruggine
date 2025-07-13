@@ -19,7 +19,7 @@ class ChatAdapter extends TypeAdapter<Chat> {
     return Chat(
       id: fields[0] as String,
       lastSender: fields[1] as String,
-      lastMessage: fields[2] as String,
+      lastMessage: fields[2] as String?,
       lastTime: fields[3] as DateTime,
     );
   }

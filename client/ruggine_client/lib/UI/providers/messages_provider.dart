@@ -61,6 +61,7 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
         if (lastMessage == state?.last) {
           await _chatNotifier.updateLastMessage(chatId, lastMessage);
         }
+        await _chatNotifier.setUnreadCount(chatId, messages.length);
       } else if (state == null) {
         state = [];
       }

@@ -6,6 +6,7 @@ import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
 import '../../models/chat.dart';
 import '../../models/invite.dart';
 import '../providers/chats_provider.dart';
+import '../providers/messages_provider.dart';
 
 
 
@@ -69,6 +70,16 @@ class HomePage extends ConsumerWidget {
                     icon: Icon(Icons.group_add),
                     label: Text("Crea gruppo"),
                     onPressed: () => handleCreateGroup(context, ref),
+                  ):null,
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: isWide?
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.group_add),
+                    label: Text("ricevi falso messaggio su gruppo 1"),
+                    onPressed: () => handleNewMessage(context, ref),
                   ):null,
                 ),
                 SizedBox(height: 12),
@@ -140,93 +151,98 @@ class HomePage extends ConsumerWidget {
                                 final dialogInvites = ref.watch(invitesProvider);
                                 return AlertDialog(
                                   title: Text("Inviti"),
-                                  content: SizedBox(
-                                    width: double.maxFinite,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: dialogInvites != null && dialogInvites.isNotEmpty
-                                          ? dialogInvites
-                                          .map((invite) => Card(
-                                            margin: EdgeInsets.symmetric(vertical: 4.0),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(12.0),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Icon(Icons.group, size: 20),
-                                                      SizedBox(width: 8),
-                                                      Expanded(
-                                                        child: Text(
-                                                          invite.groupName,
-                                                          style: TextStyle(
-                                                            fontWeight: FontWeight.w500,
-                                                            fontSize: 16,
+                                  content: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: 500, // Reasonable max width
+                                      maxHeight: 400, // Set a maximum height
+                                    ),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: dialogInvites != null && dialogInvites.isNotEmpty
+                                            ? dialogInvites
+                                            .map((invite) => Card(
+                                              margin: EdgeInsets.symmetric(vertical: 4.0),
+                                              child: Padding(
+                                                padding: EdgeInsets.all(12.0),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Icon(Icons.group, size: 20),
+                                                        SizedBox(width: 154),
+                                                        Expanded(
+                                                          child: Text(
+                                                            invite.groupName,
+                                                            style: TextStyle(
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 16,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 12),
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.end,
-                                                    children: [
-                                                      ElevatedButton(
-                                                        style: ElevatedButton.styleFrom(
-                                                          backgroundColor: Colors.green,
-                                                          foregroundColor: Colors.white,
-                                                          padding: EdgeInsets.symmetric(
-                                                            horizontal: 16,
-                                                            vertical: 8
+                                                      ],
+                                                    ),
+                                                    SizedBox(height: 12),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.end,
+                                                      children: [
+                                                        ElevatedButton(
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor: Colors.green,
+                                                            foregroundColor: Colors.white,
+                                                            padding: EdgeInsets.symmetric(
+                                                                horizontal: 16,
+                                                                vertical: 8
+                                                            ),
                                                           ),
+                                                          child: Text("Accetta"),
+                                                          onPressed: () {
+                                                            ref.read(invitesProvider.notifier).acceptInvite(invite.id);
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              SnackBar(content: Text("Invito accettato per ${invite.groupName}")),
+                                                            );
+                                                          },
                                                         ),
-                                                        child: Text("Accetta"),
-                                                        onPressed: () {
-                                                          ref.read(invitesProvider.notifier).acceptInvite(invite.id);
-                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                            SnackBar(content: Text("Invito accettato per ${invite.groupName}")),
-                                                          );
-                                                        },
-                                                      ),
-                                                      SizedBox(width: 8),
-                                                      ElevatedButton(
-                                                        style: ElevatedButton.styleFrom(
-                                                          backgroundColor: Colors.grey.shade300,
-                                                          foregroundColor: Colors.black,
-                                                          padding: EdgeInsets.symmetric(
-                                                            horizontal: 16,
-                                                            vertical: 8
+                                                        SizedBox(width: 8),
+                                                        ElevatedButton(
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor: Colors.grey.shade300,
+                                                            foregroundColor: Colors.black,
+                                                            padding: EdgeInsets.symmetric(
+                                                                horizontal: 16,
+                                                                vertical: 8
+                                                            ),
                                                           ),
+                                                          child: Text("Rifiuta"),
+                                                          onPressed: () {
+                                                            ref.read(invitesProvider.notifier).declineInvite(invite.id);
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              SnackBar(content: Text("Invito rifiutato per ${invite.groupName}")),
+                                                            );
+                                                          },
                                                         ),
-                                                        child: Text("Rifiuta"),
-                                                        onPressed: () {
-                                                          ref.read(invitesProvider.notifier).declineInvite(invite.id);
-                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                            SnackBar(content: Text("Invito rifiutato per ${invite.groupName}")),
-                                                          );
-                                                        },
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
+                                            ))
+                                            .toList()
+                                            : [
+                                          Padding(
+                                            padding: EdgeInsets.all(16.0),
+                                            child: Text(
+                                              "Nessun invito disponibile",
+                                              style: TextStyle(
+                                                color: Colors.grey.shade600,
+                                                fontSize: 16,
+                                              ),
+                                              textAlign: TextAlign.center,
                                             ),
-                                          ))
-                                          .toList()
-                                          : [
-                                        Padding(
-                                          padding: EdgeInsets.all(16.0),
-                                          child: Text(
-                                            "Nessun invito disponibile",
-                                            style: TextStyle(
-                                              color: Colors.grey.shade600,
-                                              fontSize: 16,
-                                            ),
-                                            textAlign: TextAlign.center,
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   actions: [
@@ -380,7 +396,7 @@ class HomePage extends ConsumerWidget {
       Chat(
         id: (chatz.length + 1).toString(),
         lastSender: "Zio Pera",
-        lastMessage: "Ciao, questo è un messaggio di prova!",
+        lastMessage: null,
         lastTime: DateTime.now(),
         newMessages: 10,
       ),
@@ -398,5 +414,10 @@ class HomePage extends ConsumerWidget {
             ],
           ),
     );
+  }
+
+  void handleNewMessage(BuildContext context, WidgetRef ref) {
+    final messagesNotifier = ref.read(msgProvider.notifier);
+    messagesNotifier.loadMessages("1"); //for testing purposes it aways returns 2 new messages
   }
 }

@@ -120,6 +120,24 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
       }
     }
   }
+
+  Future<void> setUnreadCount(String chatId, int newMsgs) async {
+    try {
+      if (state != null) {
+        final index = state!.indexWhere((chat) => chat.id == chatId);
+        if (index != -1) {
+          final updatedChat = state![index].copyWith(id: chatId, newMessages: state![index].newMessages + newMsgs);
+          state![index] = updatedChat;
+          state = sortChats([...?state]);
+          await _repo.saveChats([updatedChat]);
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error setting unread count: $e");
+      }
+    }
+  }
   
   Future<void> updateLastMessage(String chatId, Message? msg) async {
     try {
@@ -127,21 +145,28 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
         final index = state!.indexWhere((chat) => chat.id == chatId);
         if (index != -1) {
           if (msg == null) {
-            state![index]= state![index].copyWith(
-              id: chatId,
-              lastMessage: null
+            state![index] = state![index].copyWith(
+                id: chatId,
+                lastMessage: null
             );
-          }else{
-              state![index]= state![index].copyWith(
+          } else {
+            state![index] = state![index].copyWith(
               id: chatId,
               lastSender: msg.senderName,
               lastMessage: msg.content,
               lastTime: msg.timestamp,
             );
           }
-          state = sortChats(state!);
-          await _repo.saveChats([state![index]]);
+        }else{
+          state!.add(Chat(
+            id: chatId,
+            lastSender: msg?.senderName ?? '',
+            lastMessage: msg?.content,
+            lastTime: msg?.timestamp ?? DateTime.now(),
+          ));
         }
+        state = sortChats(state!);
+        await _repo.saveChats([state![index]]);
       }
     } catch (e) {
       if (kDebugMode) {
@@ -149,5 +174,4 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
       }
     }
   }
-
 }

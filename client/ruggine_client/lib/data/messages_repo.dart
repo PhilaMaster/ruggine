@@ -111,6 +111,10 @@ class MessagesRepo {
       if (kDebugMode) {
         print("Retrieved ${msgs} messages for chat $chatId from API.");
       }
+      // Save messages to local storage
+      for (var msg in msgs) {
+        await LocalData.saveMessage(chatId, msg);
+      }
       return msgs;
     } catch (e) {
       throw Exception('Error fetching messages: $e');
