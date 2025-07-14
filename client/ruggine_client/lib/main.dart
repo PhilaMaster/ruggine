@@ -13,6 +13,7 @@ import 'UI/pages/settings.dart';
 import 'UI/providers/auth_provider.dart';
 import 'UI/providers/message_service.dart';
 import 'UI/providers/theme_provider.dart';
+import 'UI/providers/websocket_provider.dart';
 import 'models/chat.dart';
 import 'models/message.dart';
 
@@ -21,14 +22,16 @@ final routerProvider = Provider<GoRouter>((ref) {
   final isLoggedIn = auth != null;
 
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/login',
     redirect: (context, state) {
       if (kDebugMode) {
         print(state.uri.toString());
       }
       final location = state.uri.toString();
       if (!isLoggedIn && location != '/login') return '/login';
-      if (isLoggedIn && location == '/login') return '/';
+      if (isLoggedIn && location == '/login') {
+        return route_home;
+      };
       return null;
     },
     routes: [
@@ -89,6 +92,8 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeNotifierProvider);
     final router = ref.watch(routerProvider);
+    // Inizializza il WebSocketProvider per mantenerlo attivo
+    ref.watch(webSocketProvider);
 
     return MaterialApp.router(
       title: 'Ruggine Chat',

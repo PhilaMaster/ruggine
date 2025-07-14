@@ -174,4 +174,41 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
       }
     }
   }
+
+  Future<void> newMessage(String? chatId, Message message, bool isChatOpened) async {
+    if (chatId == null) {
+      if (kDebugMode) {
+        print("Chat ID is null, cannot add message.");
+        return;
+      }
+    }
+    await updateLastMessage(chatId!, message);
+    if (state != null) {
+      final index = state!.indexWhere((chat) => chat.id == chatId);
+      if (index != -1) {
+        state![index] = state![index].copyWith(newMessages: state![index].newMessages + (isChatOpened ? 0 : 1));
+      } else {
+        // If chat not found, create a new one
+        state!.add(Chat(
+          id: chatId,
+          lastSender: message.senderName,
+          lastMessage: message.content,
+          lastTime: message.timestamp,
+          newMessages: 1,
+        ));
+      }
+      state = sortChats(state!);
+    } else {
+      state = [Chat(
+        id: chatId,
+        lastSender: message.senderName,
+        lastMessage: message.content,
+        lastTime: message.timestamp,
+        newMessages: 1,
+      )];
+    }
+    if (kDebugMode) {
+      print("Message added to chat $chatId: ${message.content}");
+    }
+  }
 }

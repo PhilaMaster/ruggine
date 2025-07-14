@@ -14,4 +14,16 @@ class AppConfig {
       return 'http://localhost:8080/'; // Fallback for desktop
     }
   }
+
+  static String get webSocketUrl {
+    if (kIsWeb) {
+      return 'ws://192.168.126.87:8080/ws'; // Use your LAN IP for web
+    } else if (Platform.isAndroid) {
+      return 'ws://10.0.2.2:8080/ws'; // Android emulator
+    } else if (Platform.isIOS) {
+      return 'ws://localhost:8080/ws'; // iOS simulator
+    } else {
+      return 'ws://localhost:8080/ws'; // Fallback for desktop
+    }
+  }
 }

@@ -24,12 +24,16 @@ mod handler {
     pub mod group_message;
     pub mod group;
     pub mod group_invitation;
+
+    pub mod websocket;
 }
 
-
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
 // imports
-use diesel::prelude::*;
+use actix::prelude::*;
 use actix_web::{web, App, HttpServer, Result, HttpResponse, middleware::Logger, HttpRequest};
+use actix_web::web::Data;
 use serde::{Deserialize, Serialize};
 use crate::handler::authorization::authorization::{login_handler, test_handler};
 use crate::handler::user::user::{create_user_handler, get_users_handler};
@@ -38,16 +42,23 @@ use crate::handler::private_messages::private_messages::{get_private_messages_ha
 use crate::handler::group::group::{get_all_groups_of_a_user_handler, create_group_handler};
 use crate::handler::group_invitation::group_invitation::{create_group_invitation_handler, delete_group_invitation_handler, get_user_group_invitations_handler};
 use crate::handler::group_message::group_message::{get_all_group_messages_handler, send_group_message_handler};
+use crate::handler::websocket;
+use crate::handler::websocket::WebSocketHandler;
+
+type ClientSockets = Arc<Mutex<HashMap<String, Vec<Addr<WebSocketHandler>>>>>;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
 
+    let client_sockets: ClientSockets = Arc::new(Mutex::new(HashMap::new()));
+
 
     println!("Server running on http://localhost:8080");
 
-    HttpServer::new(|| {
+    HttpServer::new(move || {
         App::new()
+            .app_data(Data::new(client_sockets.clone()))
             .wrap(Logger::default())
             .service(
                 web::scope("")
@@ -56,6 +67,7 @@ async fn main() -> std::io::Result<()> {
                     .service(
                         web::scope("")
                             .wrap(AuthMiddleware)
+                            .route("/ws", web::get().to(websocket::ws_index))
                             .route("/users", web::get().to(get_users_handler))
                             .route("/testToken", web::get().to(test_handler))
                             .route("/privateMessages", web::get().to(get_private_messages_handler))

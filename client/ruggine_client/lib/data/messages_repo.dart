@@ -134,4 +134,18 @@ class MessagesRepo {
       throw Exception('Error sending message: $e');
     }
   }
+
+  Future<void> saveMessage(String? chatId, Message message) async {
+    if (chatId == null) {
+      throw Exception('Chat ID cannot be null');
+    }
+    try {
+      await LocalData.saveMessage(chatId, message);
+      if (kDebugMode) {
+        print("Message saved: ${message.id} for chat $chatId");
+      }
+    } catch (e) {
+      throw Exception('Error saving message: $e');
+    }
+  }
 }

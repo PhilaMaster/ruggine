@@ -71,6 +71,7 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
       }
     }
   }
+
   Future<void> sendMessage(String chatId, String content) async {
     try {
       final mex = await _repo.sendMessage(chatId, content);
@@ -128,6 +129,27 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
     state = [];
     if (kDebugMode) {
       print("Messages of chat $id state reset.");
+    }
+  }
+
+  Future<void> newMessage(String? chatId, Message message) async{
+    if (chatId == null) {
+      if (kDebugMode) {
+        print("Chat ID is null, cannot add message.");
+        return;
+      }
+    }
+    if (_chatId == chatId) {
+      if (state == null) {
+        state = [message];
+      } else {
+        state = [...?state, message];
+      }
+    }
+    await _repo.saveMessage(chatId, message);
+    await _chatNotifier.newMessage(chatId, message, _chatId == chatId);
+    if (kDebugMode) {
+      print("Message added to chat $chatId: ${message.content}");
     }
   }
 

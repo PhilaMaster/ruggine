@@ -1,13 +1,18 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ruggine_client/models/chat.dart';
 import '../core/storage.dart';
 import '../core/const.dart';
+import '../core/dio_interceptor.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ApiClient {
   late final Dio dio;
+  late final WebSocketChannel webSocket;
 
-  ApiClient(){
+  ApiClient([Ref? ref]){
     dio = Dio(BaseOptions(
       baseUrl: apibase,
       connectTimeout: const Duration(seconds: 5),
@@ -23,6 +28,10 @@ class ApiClient {
         return handler.next(options);
       },
     ));
+    // Aggiungi l'interceptor per gestire 401/403
+    if (ref != null) {
+      dio.interceptors.add(AuthInterceptor(ref));
+    }
   }
 
   Future<Response> login(String username, String pword){
@@ -171,5 +180,15 @@ class ApiClient {
         },
       ),
     );
+  }
+
+  Future<void> initSocket(String token) async {
+    if (kDebugMode) {
+      print("Initializing WebSocket with token: $token");
+    }
+    webSocket = WebSocketChannel.connect(
+        Uri.parse(websocketUrl),
+        );
+    await webSocket.ready;
   }
 }

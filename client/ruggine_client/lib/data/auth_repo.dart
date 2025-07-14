@@ -69,10 +69,15 @@ class AuthRepo{
   Future<User?> getCurrentUser() async {
     final token = await SecureStorage.readToken();
     if (token == null) return null;
-
+    // Verifica scadenza token
+    if (JwtDecoder.isExpired(token)) {
+      await SecureStorage.deleteToken();
+      return null;
+    }
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     final userId = decodedToken['user_id']?.toString() ?? '';
     final userName = decodedToken['username'] ?? '';
+    // Inizializza socket con il token
 
     return User(
       id: userId,
@@ -88,6 +93,19 @@ class AuthRepo{
 
   Future<bool> isLoggedIn() async {
     final token = await SecureStorage.readToken();
-    return token != null;
+    if (token == null) return false;
+    if (JwtDecoder.isExpired(token)) {
+      await SecureStorage.deleteToken();
+      return false;
+    }
+    return true;
+  }
+
+  Future<String?> getToken() {
+    final token = SecureStorage.readToken();
+    if (token == null) {
+      throw Exception('Token non trovato');
+    }
+    return token;
   }
 }

@@ -3,6 +3,7 @@
 import 'package:ruggine_client/config.dart';
 
 final String apibase = AppConfig.apiBaseUrl;
+final String websocketUrl = AppConfig.webSocketUrl;
 const String apipath_register = "auth/register";
 const String apipath_login = "auth/login";
 const String apipath_user = "user";

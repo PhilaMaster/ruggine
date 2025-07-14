@@ -1,36 +1,88 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/api_client.dart';
 import '../../data/auth_repo.dart';
 import '../../models/user.dart';
+import 'websocket_provider.dart';
+import 'chats_provider.dart';
+import 'invites_provider.dart';
 
 final authRepositoryProvider = Provider<AuthRepo>((ref) {
-  return AuthRepo(ApiClient());
+  return AuthRepo(ApiClient(ref));
 });
 
 final authProvider = StateNotifierProvider<AuthNotifier, User?>((ref) {
   final repo = ref.read(authRepositoryProvider);
-  return AuthNotifier(repo);
+  return AuthNotifier(repo, ref);
 });
 
 class AuthNotifier extends StateNotifier<User?> {
   final AuthRepo repo;
+  final Ref ref;
 
-  AuthNotifier(this.repo) : super(null) {
+  AuthNotifier(this.repo, this.ref) : super(null) {
     _checkLogin();
   }
 
   void _checkLogin() async {
     final user = await repo.getCurrentUser();
-    state = user;
+    if (user == null) {
+      await logout();
+    } else {
+      state = user;
+      // Inizializza WebSocket e recupera messaggi se l'utente è già autenticato
+      await _initializeUserSession();
+    }
+  }
+
+  Future<String?> get token {
+    return repo.getToken();
   }
 
   Future<void> login(String username, String password) async {
     final user = await repo.login(username, password);
-    state = user;
+    if (user == null) {
+      await logout();
+    } else {
+      state = user;
+      // Inizializza WebSocket e recupera messaggi dopo login riuscito
+      await _initializeUserSession();
+    }
   }
 
   Future<void> logout() async {
+    // Disconnetti WebSocket prima del logout
+    await _cleanupUserSession();
     await repo.logout();
     state = null;
+  }
+
+  // Inizializza WebSocket e recupera dati dell'utente
+  Future<void> _initializeUserSession() async {
+    try {
+      // Il WebSocket si connetterà automaticamente grazie al listener nel WebSocketNotifier
+
+      //TODO Recupera le chat dell'utente
+      if (kDebugMode) {
+        print('Inizializzazione sessione utente: ${state?.username}');
+      }
+
+      // Recupera gli inviti pending
+      ref.read(invitesProvider.notifier).loadInvites();
+    } catch (e) {
+      // Gestisci errori di inizializzazione
+      print('Errore durante l\'inizializzazione della sessione: $e');
+    }
+  }
+
+  // Pulisce risorse quando l'utente si disconnette
+  Future<void> _cleanupUserSession() async {
+    try {
+      //eventuale pulizia delle risorse WebSocket
+    } catch (e) {
+      if (kDebugMode) {
+        print('Errore durante la pulizia della sessione: $e');
+      }
+    }
   }
 }
