@@ -52,7 +52,8 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
     // Ascolta i cambiamenti di autenticazione
     ref.listen<User?>(authProvider, (previous, next) {
       if (next != null && previous == null) {
-        // Utente si è loggato
+        // Utente si è loggato - reset del contatore per nuovo login
+        _reconnectAttempts = 0;
         connect();
       } else if (next == null && previous != null) {
         // Utente si è disconnesso
@@ -93,7 +94,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
         errorMessage: null,
       );
 
-      _reconnectAttempts = 0;
+      // Non resettiamo qui _reconnectAttempts per permettere il conteggio corretto
       _startPingTimer();
 
     } catch (e) {
@@ -181,6 +182,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
   }
 
   void _scheduleReconnect() {
+    print("tenativo di riconnessione: ${_reconnectAttempts + 1}/$maxReconnectAttempts");
     if (_reconnectAttempts < maxReconnectAttempts) {
       _reconnectAttempts++;
       _reconnectTimer = Timer(reconnectDelay, () {
@@ -188,6 +190,14 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
           connect();
         }
       });
+    }
+    else{
+      print('Raggiunto il numero massimo di tentativi di riconnessione');
+      state = state.copyWith(
+        status: WebSocketStatus.error,
+        errorMessage: 'Raggiunto il numero massimo di tentativi di riconnessione',
+      );
+      _reconnectTimer?.cancel();
     }
   }
 
