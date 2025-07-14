@@ -1,6 +1,24 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    chat_members (chat_id, user_id) {
+        chat_id -> Integer,
+        user_id -> Integer,
+        joined_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
+    chats (id) {
+        id -> Nullable<Integer>,
+        is_group -> Bool,
+        name -> Nullable<Text>,
+        created_by -> Nullable<Integer>,
+        created_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
     group_invitation (group_id, sender_id, receiver_id) {
         group_id -> Integer,
         sender_id -> Integer,
@@ -10,7 +28,7 @@ diesel::table! {
 
 diesel::table! {
     group_message (id) {
-        id -> Integer,
+        id -> Nullable<Integer>,
         text -> Text,
         sender_id -> Integer,
         group_rx_id -> Integer,
@@ -22,6 +40,16 @@ diesel::table! {
     groups (id) {
         id -> Nullable<Integer>,
         name -> Text,
+    }
+}
+
+diesel::table! {
+    messages (id) {
+        id -> Nullable<Integer>,
+        chat_id -> Integer,
+        sender_id -> Nullable<Integer>,
+        content -> Nullable<Text>,
+        sent_at -> Nullable<Timestamp>,
     }
 }
 
@@ -50,16 +78,24 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(chat_members -> chats (chat_id));
+diesel::joinable!(chat_members -> users (user_id));
+diesel::joinable!(chats -> users (created_by));
 diesel::joinable!(group_invitation -> groups (group_id));
 diesel::joinable!(group_message -> groups (group_rx_id));
 diesel::joinable!(group_message -> users (sender_id));
+diesel::joinable!(messages -> chats (chat_id));
+diesel::joinable!(messages -> users (sender_id));
 diesel::joinable!(user_in_group -> groups (group_id));
 diesel::joinable!(user_in_group -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
+    chat_members,
+    chats,
     group_invitation,
     group_message,
     groups,
+    messages,
     private_message,
     user_in_group,
     users,

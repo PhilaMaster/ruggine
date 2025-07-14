@@ -5,7 +5,10 @@
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\edoar\OneDrive - Politecnico di Torino\Poli\4QuartoAnno\PDS\Ruggine-ongoing\backend\db\ruggine.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/backend/db/ruggine.db</jdbc-url>
+      <jdbc-additional-properties>
+        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+      </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
       <libraries>
         <library>

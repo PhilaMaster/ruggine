@@ -55,5 +55,4 @@ pub mod group {
     pub struct NewGroup {
         pub name: String,
     }
-
 }

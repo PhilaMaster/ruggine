@@ -4,11 +4,31 @@
 #![allow(clippy::all)]
 
 use diesel::prelude::*;
-use serde::{Serialize, Deserialize};
 use crate::schema::*;
+use chrono::NaiveDateTime;
+use diesel::{Identifiable, Queryable};
+use serde::{Deserialize, Serialize};
 
+#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
+#[diesel(primary_key(chat_id, user_id))]
+#[diesel(table_name = chat_members)]
+pub struct ChatMember {
+    pub chat_id: i32,
+    pub user_id: i32,
+    pub joined_at: Option<String>,
+}
 
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
+#[diesel(table_name = chats)]
+pub struct Chat {
+    pub id: Option<i32>,
+    pub is_group: bool,
+    pub name: Option<String>,
+    pub created_by: Option<i32>,
+    pub created_at: Option<String>,
+}
+
+#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = group_invitation)]
 #[diesel(primary_key(group_id, sender_id, receiver_id))]
 pub struct GroupInvitation {
@@ -20,21 +40,30 @@ pub struct GroupInvitation {
 #[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = group_message)]
 pub struct GroupMessage {
-    pub id: i32,
+    pub id: Option<i32>,
     pub text: String,
     pub sender_id: i32,
     pub group_rx_id: i32,
     pub sent_at: String,
 }
 
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize)]
-#[diesel(table_name = groups)]
+#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 pub struct Group {
     pub id: Option<i32>,
     pub name: String,
 }
 
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
+#[diesel(table_name = messages)]
+pub struct Message {
+    pub id: Option<i32>,
+    pub chat_id: i32,
+    pub sender_id: Option<i32>,
+    pub content: Option<String>,
+    pub sent_at: Option<String>,//todo check se funziona, sennò usare data
+}
+
+#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = private_message)]
 pub struct PrivateMessage {
     pub id: i32,
@@ -44,7 +73,7 @@ pub struct PrivateMessage {
     pub sent_at: String,
 }
 
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = user_in_group)]
 #[diesel(primary_key(group_id, user_id))]
 pub struct UserInGroup {
@@ -52,8 +81,7 @@ pub struct UserInGroup {
     pub user_id: i32,
 }
 
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize)]
-#[diesel(table_name = users)]
+#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 pub struct User {
     pub id: i32,
     pub username: String,
