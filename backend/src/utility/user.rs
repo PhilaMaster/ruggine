@@ -25,14 +25,14 @@ pub mod user{
 
     // user utility
     #[derive(Deserialize, Clone, Debug)]
-    pub(crate) struct CreateUserRequest {
+    pub(crate) struct UserRequest {
         pub(crate) username: String,
         pub(crate) password: String,
     }
 
-    impl CreateUserRequest {
+    impl UserRequest {
         pub fn new(username: String, password: String) -> Self {
-            CreateUserRequest { username, password }
+            UserRequest { username, password }
         }
 
     }
@@ -61,6 +61,10 @@ pub mod user{
         }
     }
 
+    pub(crate) fn get_user_by_username(conn: &mut SqliteConnection, user: &str) -> QueryResult<User> {
+        use crate::schema::users::dsl::*;
+        users.filter(username.eq(user)).first::<User>(conn)
+    }
 
     pub fn create_user(conn: &mut SqliteConnection, username: &str, password_hash: &str) -> QueryResult<User> {
         use diesel::insert_into;

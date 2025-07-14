@@ -1,17 +1,15 @@
 pub mod authorization{
-
     use actix_web::{web, HttpMessage, HttpRequest, HttpResponse, Result};
-    use crate::utility::user::user::CreateUserRequest;
+    use crate::utility::user::user::UserRequest;
     use std::env;
     use std::time::{SystemTime, UNIX_EPOCH};
-    use actix_web::http::StatusCode;
-    use jsonwebtoken::{encode, decode, Header, Validation, EncodingKey, DecodingKey};
+    use jsonwebtoken::{encode, Header, EncodingKey};
     use crate::utility::authorization::authorization::{authenticate_user, Claims};
     use crate::utility::connection::establish_connection;
 
-    pub(crate) async fn login_handler(user_data: web::Json<CreateUserRequest>) -> Result<HttpResponse> {
+    pub(crate) async fn login_handler(user_data: web::Json<UserRequest>) -> Result<HttpResponse> {
         let mut conn = establish_connection();
-        println!("Received login request for user: {}", user_data.username);
+
         match authenticate_user(&mut conn, user_data.username.as_str(), user_data.password.as_str()) {
             Ok(user) => {
                 let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() as usize;
@@ -29,9 +27,9 @@ pub mod authorization{
             })))
             }
             Err(_) => {
-                Ok(HttpResponse::Unauthorized().json(serde_json::json!({
-                    "error": "Invalid username or password"
-                })))
+                Ok(HttpResponse::ImATeapot().json(serde_json::json!({
+                "error": "Failed to authenticate user"
+            })))
             }
         }
     }
