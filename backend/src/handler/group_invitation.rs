@@ -37,12 +37,7 @@ pub mod group_invitation {
 
         let group_name = invitation_data.group_name.clone();
         let group_id = match get_group_by_name(&mut conn, group_name.clone()) {
-            Ok(group) => match group.id {
-                Some(id) => id,
-                None => {
-                    return Ok(HttpResponse::BadRequest().json(format!("Group {} has no valid ID", &group_name)));
-                }
-            },
+            Ok(group) => group.id,
             Err(_) => {
                 return Ok(HttpResponse::NotFound().json(format!("Group {} not found", &group_name)));
             }
@@ -50,7 +45,7 @@ pub mod group_invitation {
         // richiede login, quindi serve ottenere i claims
         if let Some(claims) = req.extensions().get::<Claims>() {
             match create_group_invitation(&mut conn, group_id, claims.user_id, rec_user_id) {
-                Ok(invitation) => {
+                Ok(_) => {
                     Ok(HttpResponse::Created().finish())
                 },
                 Err(e) => {

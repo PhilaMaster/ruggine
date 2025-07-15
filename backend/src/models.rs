@@ -15,17 +15,17 @@ use serde::{Deserialize, Serialize};
 pub struct ChatMember {
     pub chat_id: i32,
     pub user_id: i32,
-    pub joined_at: Option<String>,
+    pub joined_at: String,
 }
 
 #[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = chats)]
 pub struct Chat {
-    pub id: Option<i32>,
+    pub id: i32,
     pub is_group: bool,
-    pub name: Option<String>,
-    pub created_by: Option<i32>,
-    pub created_at: Option<String>,
+    pub name: Option<String>,//null if private chat
+    pub created_by: i32,
+    pub created_at: String,
 }
 
 #[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]

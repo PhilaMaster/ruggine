@@ -18,7 +18,7 @@ pub mod chats{
 
     pub async fn get_chat_info_handler(query: web::Query<ChatInfoQuery>) -> Result<HttpResponse> {
         let mut conn = establish_connection();
-        let chat = get_chat_by_id(&mut conn, query.chat_id).ok().flatten();
+        let chat = get_chat_by_id(&mut conn, query.chat_id).ok().flatten();//sarebbe possibile effettuare un check per vedere se la chat è sua, tramite il token
         if let Some(chat) = chat {
             let members = get_chat_members_by_chat_id(&mut conn, query.chat_id).unwrap();
             Ok(HttpResponse::Ok().json(ChatInfoWithMembers {

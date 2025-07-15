@@ -4,17 +4,17 @@ diesel::table! {
     chat_members (chat_id, user_id) {
         chat_id -> Integer,
         user_id -> Integer,
-        joined_at -> Nullable<Timestamp>,
+        joined_at -> Timestamp,
     }
 }
 
 diesel::table! {
     chats (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         is_group -> Bool,
         name -> Nullable<Text>,
-        created_by -> Nullable<Integer>,
-        created_at -> Nullable<Timestamp>,
+        created_by -> Integer,
+        created_at -> Timestamp,
     }
 }
 

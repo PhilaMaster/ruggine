@@ -3,7 +3,7 @@ pub(crate) mod group_invitation {
     use serde::Deserialize;
     use crate::schema::{group_invitation};
     use crate::models::GroupInvitation;
-    use crate::utility::group::group::{get_all_groups_of_a_user};
+    use crate::utility::group::group::{get_all_groups_of_a_user, is_user_part_of_group};
 
     #[derive(Deserialize, Clone, Debug)]
     pub(crate) struct GroupInvitationRequest {
@@ -38,10 +38,7 @@ pub(crate) mod group_invitation {
         };
 
         // controlla che l'utente che crea l'invito sia effettivamente un membro del gruppo
-        let user_groups = get_all_groups_of_a_user(conn, sender_id)?;
-        if !user_groups.iter().any(|g| g.id == Some(group_id)) {
-            return Err(diesel::result::Error::NotFound);
-        }
+        is_user_part_of_group(conn, sender_id,group_id)?;
 
         diesel::insert_into(group_invitation::table)
             .values(&new_invitation)
