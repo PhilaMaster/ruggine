@@ -56,11 +56,11 @@ pub struct Group {
 #[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = messages)]
 pub struct Message {
-    pub id: Option<i32>,
+    pub id: i32,
     pub chat_id: i32,
-    pub sender_id: Option<i32>,
-    pub content: Option<String>,
-    pub sent_at: Option<String>,//todo check se funziona, sennò usare data
+    pub sender_id: i32,
+    pub content: String,
+    pub sent_at: String,
 }
 
 #[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
