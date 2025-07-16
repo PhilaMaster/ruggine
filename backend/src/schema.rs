@@ -45,11 +45,11 @@ diesel::table! {
 
 diesel::table! {
     messages (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         chat_id -> Integer,
-        sender_id -> Nullable<Integer>,
-        content -> Nullable<Text>,
-        sent_at -> Nullable<Timestamp>,
+        sender_id -> Integer,
+        content -> Text,
+        sent_at -> Timestamp,
     }
 }
 
