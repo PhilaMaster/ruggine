@@ -30,11 +30,8 @@ pub mod messages {
 
         diesel::insert_into(messages::table)
             .values(&new_message)
-            .execute(conn)?;
-
-        messages::table
-            .order_by(messages::id.desc())
-            .first::<Message>(conn)
+            .returning(messages::all_columns)
+            .get_result::<Message>(conn)
     }
 
     #[derive(Deserialize, Clone, Debug)]
