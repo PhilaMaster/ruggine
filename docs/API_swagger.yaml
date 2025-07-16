@@ -184,7 +184,7 @@ paths:
         '201':
           description: Invito creato con successo
         '400':
-          description: Il destinatario è già membro del gruppo
+          description: Il destinatario è già membro del gruppo/Esiste già un invito per questo gruppo,
         '401':
           description: Token mancante o non valido
         '403':

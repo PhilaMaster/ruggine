@@ -40,6 +40,10 @@ pub mod group_invitation {
                 Ok(_) => {
                     Ok(HttpResponse::Created().finish())
                 },
+                // se esiste già un invito per questo gruppo, restituisce un errore 400
+                Err(diesel::result::Error::DatabaseError(diesel::result::DatabaseErrorKind::UniqueViolation, _)) => {
+                    Ok(HttpResponse::BadRequest().body("L'invito per questo gruppo esiste già"))
+                },
                 Err(e) => {
                     Err(actix_web::error::ErrorInternalServerError(format!("Database error: {}", e)))
                 }

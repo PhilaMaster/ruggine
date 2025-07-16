@@ -4,6 +4,7 @@ pub(crate) mod group_invitation {
     use serde::Deserialize;
     use crate::schema::{group_invitation};
     use crate::models::GroupInvitation;
+    use crate::utility::chats::chats::is_user_in_chat;
     use crate::utility::group_chat::group_chat::{is_user_part_of_group};
 
     #[derive(serde::Deserialize)]
