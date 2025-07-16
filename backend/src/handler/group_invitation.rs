@@ -56,7 +56,7 @@ pub mod group_invitation {
             let sender_id: i32 = claims.user_id;
             let receiver_id: i32 = req.match_info().get("receiver_id").unwrap_or("0").parse().unwrap_or(0);
 
-            match crate::utility::group_invitation::group_invitation::delete_group_invitation(&mut conn, group_id, sender_id, receiver_id) {
+            match crate::utility::group_invitation::group_invitation::delete_group_invitation(&mut conn, group_id, sender_id) {
                 Ok(_) => {
                     Ok(HttpResponse::NoContent().finish())
                 },

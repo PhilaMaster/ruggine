@@ -11,12 +11,6 @@ pub mod chats{
         Ok(chat_ids)
     }
 
-    // pub fn get_all_chats_of_a_user(conn: &mut SqliteConnection, user_id: i32) -> QueryResult<Vec<Chat>> {
-    //     let chat_ids = get_chat_ids_of_user(conn, user_id)?;
-    //     chats::table
-    //         .filter(chats::id.eq_any(chat_ids))
-    //         .load::<Chat>(conn)
-    // }
 
     pub fn get_chat_by_id(conn: &mut SqliteConnection, chat_id: i32) -> QueryResult<Option<Chat>> {
         use crate::schema::chats::dsl::*;
@@ -54,5 +48,28 @@ pub mod chats{
             .filter(chat_id.eq(c_id))
             .first::<ChatMember>(conn);
         res.is_ok()
+    }
+
+
+    #[derive(serde::Deserialize, Clone, Debug, Insertable)]
+    pub struct InsertChatMember {
+        chat_id: i32,
+        user_id: i32,
+    }
+
+    // aggiungi un membro a una chat
+    pub fn add_member_to_chat(conn: &mut SqliteConnection, chat_id: i32, user_id: i32) -> QueryResult<()> {
+        use crate::schema::chat_members::dsl as cm;
+
+        let new_member = InsertChatMember {
+            chat_id,
+            user_id,
+        };
+
+        diesel::insert_into(cm::chat_members)
+            .values(&new_member)
+            .execute(conn)?;
+
+        Ok(())
     }
 }
