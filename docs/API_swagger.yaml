@@ -1,0 +1,530 @@
+openapi: 3.0.0
+info:
+  title: Ruggine Chat API
+  version: 2.0.0
+  description: >
+    Questa API consente la gestione di una chat strutturata in gruppi e messaggi.
+    Gli utenti possono registrarsi, effettuare il login, creare gruppi, invitare altri utenti nei gruppi,
+    inviare e ricevere messaggi in tempo reale tramite WebSocket.
+      
+    L'autenticazione è gestita tramite token JWT (JSON Web Token). Una volta effettuato il login,
+    l'utente riceve un token JWT che deve essere incluso nelle richieste successive agli endpoint protetti,
+    all'interno dell'header HTTP `Authorization`, usando lo schema `Bearer`.
+    
+    Il token JWT è firmato dal server utilizzando una password conservata in modo sicuro sul server.
+    Questo assicura che il token non possa essere alterato o falsificato da terze parti.
+    
+    I JWT permettono di autenticare l'utente senza dover mantenere uno stato lato server.
+    Ogni token contiene le informazioni di identità dell'utente e ha una scadenza di 1 settimana.
+    Le richieste agli endpoint protetti devono includere un token valido per poter essere accettate.
+
+tags:
+  - name: Auth
+    description: Endpoint per autenticazione e registrazione
+  - name: Users
+    description: Gestione utenti
+  - name: Groups
+    description: Gestione gruppi
+  - name: Group Invites
+    description: Inviti per entrare nei gruppi
+  - name: Chats
+    description: Informazioni sulle chat
+  - name: Messages
+    description: Gestione messaggi
+  - name: WebSocket
+    description: Connessione WebSocket per messaggi in tempo reale
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Registra un nuovo utente
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: Utente creato con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Username già esistente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Errore interno del server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login utente
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '200':
+          description: Login riuscito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Token JWT per l'autenticazione
+        '418':
+          description: Credenziali non valide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Ottieni tutti gli utenti
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista di tutti gli utenti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Token mancante o non valido
+        '500':
+          description: Errore interno del server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /groups:
+    post:
+      tags:
+        - Groups
+      summary: Crea un nuovo gruppo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupRequest'
+      responses:
+        '201':
+          description: Gruppo creato con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '401':
+          description: Token mancante o non valido
+        '500':
+          description: Errore interno del server
+
+  /groupInvites:
+    get:
+      tags:
+        - Group Invites
+      summary: Ottieni tutti gli inviti ricevuti dall'utente
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista degli inviti ricevuti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupInvitation'
+        '401':
+          description: Token mancante o non valido
+        '500':
+          description: Errore interno del server
+
+    post:
+      tags:
+        - Group Invites
+      summary: Invia un invito a un utente per entrare nel gruppo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupInvitationRequest'
+      responses:
+        '201':
+          description: Invito creato con successo
+        '400':
+          description: Il destinatario è già membro del gruppo
+        '401':
+          description: Token mancante o non valido
+        '403':
+          description: L'utente non fa parte del gruppo
+        '500':
+          description: Errore interno del server
+
+    delete:
+      tags:
+        - Group Invites
+      summary: Cancella un invito al gruppo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: group_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID del gruppo
+      responses:
+        '204':
+          description: Invito cancellato con successo
+        '400':
+          description: ID del gruppo richiesto
+        '401':
+          description: Token mancante o non valido
+        '404':
+          description: Nessun invito trovato per il gruppo specificato
+        '500':
+          description: Errore interno del server
+
+  /groupInvites/accept:
+    post:
+      tags:
+        - Group Invites
+      summary: Accetta un invito al gruppo
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: group_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID del gruppo
+      responses:
+        '204':
+          description: Invito accettato con successo
+        '400':
+          description: ID del gruppo richiesto
+        '401':
+          description: Token mancante o non valido
+        '404':
+          description: Nessun invito per il gruppo richiesto
+        '500':
+          description: Errore interno del server
+
+  /chatInfo:
+    get:
+      tags:
+        - Chats
+      summary: Ottieni informazioni su una chat e i suoi membri
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: chat_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: ID della chat
+      responses:
+        '200':
+          description: Informazioni della chat e membri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatInfoWithMembers'
+        '401':
+          description: Token mancante o non valido
+        '403':
+          description: L'utente non fa parte della chat
+        '404':
+          description: Chat non trovata
+
+  /chatMessages:
+    get:
+      tags:
+        - Messages
+      summary: Ottieni i nuovi messaggi da una data specifica
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: since
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            default: "1970-01-01T00:00:00"
+          description: Data e ora da cui recuperare i messaggi (formato ISO 8601)
+      responses:
+        '200':
+          description: Lista dei nuovi messaggi
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '401':
+          description: Token mancante o non valido
+        '500':
+          description: Errore nel recupero dei messaggi
+
+  /sendMessage:
+    post:
+      tags:
+        - Messages
+      summary: Invia un messaggio a una chat
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Messaggio inviato con successo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          description: Token mancante o non valido
+        '403':
+          description: L'utente non fa parte della chat
+        '500':
+          description: Errore nell'invio del messaggio
+
+  /testToken:
+    get:
+      tags:
+        - Auth
+      summary: Testa la validità del token JWT
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Token valido
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "L'utente che ha fatto la richiesta è username, il suo id è: 1"
+        '401':
+          description: Token mancante o non valido
+
+  /ws:
+    get:
+      tags:
+        - WebSocket
+      summary: Stabilisce una connessione WebSocket per messaggi in tempo reale
+      security:
+        - bearerAuth: []
+      responses:
+        '101':
+          description: Connessione WebSocket stabilita
+        '401':
+          description: Token mancante o non valido
+        '400':
+          description: Richiesta WebSocket non valida
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: Nome utente
+        password:
+          type: string
+          description: Password dell'utente
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID univoco dell'utente
+        username:
+          type: string
+          description: Nome utente
+
+    CreateGroupRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Nome del gruppo
+
+    Chat:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID univoco della chat
+        is_group:
+          type: boolean
+          description: Indica se è una chat di gruppo
+        name:
+          type: string
+          nullable: true
+          description: Nome della chat (null per chat private)
+        created_by:
+          type: integer
+          description: ID dell'utente che ha creato la chat
+        created_at:
+          type: string
+          format: date-time
+          description: Data e ora di creazione della chat
+
+    ChatMember:
+      type: object
+      properties:
+        chat_id:
+          type: integer
+          description: ID della chat
+        user_id:
+          type: integer
+          description: ID dell'utente
+        joined_at:
+          type: string
+          format: date-time
+          description: Data e ora di ingresso nella chat
+
+    ChatMemberInfo:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          description: ID dell'utente
+        username:
+          type: string
+          description: Nome utente
+        joined_at:
+          type: string
+          format: date-time
+          description: Data e ora di ingresso nella chat
+
+    ChatInfoWithMembers:
+      type: object
+      properties:
+        chat:
+          $ref: '#/components/schemas/Chat'
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMemberInfo'
+
+    GroupInvitation:
+      type: object
+      properties:
+        group_id:
+          type: integer
+          description: ID del gruppo
+        sender_id:
+          type: integer
+          description: ID dell'utente che ha inviato l'invito
+        receiver_id:
+          type: integer
+          description: ID dell'utente che riceve l'invito
+
+    GroupInvitationRequest:
+      type: object
+      required:
+        - chat_id
+        - receiver_id
+      properties:
+        chat_id:
+          type: integer
+          description: ID della chat/gruppo
+        receiver_id:
+          type: integer
+          description: ID dell'utente da invitare
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID univoco del messaggio
+        chat_id:
+          type: integer
+          description: ID della chat
+        sender_id:
+          type: integer
+          description: ID dell'utente mittente
+        content:
+          type: string
+          description: Contenuto del messaggio
+        sent_at:
+          type: string
+          format: date-time
+          description: Data e ora di invio del messaggio
+
+    SendMessageRequest:
+      type: object
+      required:
+        - chat_id
+        - content
+      properties:
+        chat_id:
+          type: integer
+          description: ID della chat di destinazione
+        content:
+          type: string
+          description: Contenuto del messaggio da inviare
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Descrizione dell'errore
+        status:
+          type: integer
+          description: Codice di stato HTTP (opzionale)
