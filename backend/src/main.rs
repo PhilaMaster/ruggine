@@ -35,6 +35,7 @@ use std::sync::{Arc, Mutex};
 use actix::prelude::*;
 use actix_web::{web, App, HttpServer, Result, HttpResponse, middleware::Logger, HttpRequest};
 use actix_web::web::Data;
+use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
 use crate::handler::authorization::authorization::{login_handler, test_handler};
 use crate::handler::chats::chats::get_chat_info_handler;
@@ -46,12 +47,13 @@ use crate::handler::group_invitation::group_invitation::{create_group_invitation
 // use crate::handler::group_message::group_message::{get_all_group_messages_handler, send_group_message_handler};
 use crate::handler::websocket;
 use crate::handler::websocket::WebSocketHandler;
-use crate::handler::messages::messages::get_new_messages_since_handler;
+use crate::handler::messages::messages::{get_new_messages_since_handler, send_message_handler};
 
 type ClientSockets = Arc<Mutex<HashMap<String, Vec<Addr<WebSocketHandler>>>>>;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
     env_logger::init();
 
     let client_sockets: ClientSockets = Arc::new(Mutex::new(HashMap::new()));
@@ -79,6 +81,7 @@ async fn main() -> std::io::Result<()> {
                             .route("/groupInvites", web::delete().to(delete_group_invitation_handler))
                             .route("/chatMessages", web::get().to(get_new_messages_since_handler))
                             .route("/chatInfo", web::get().to(get_chat_info_handler))
+                            .route("/sendMessage", web::post().to(send_message_handler))
                     )
             )
     })

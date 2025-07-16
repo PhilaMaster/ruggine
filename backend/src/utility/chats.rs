@@ -1,6 +1,6 @@
 pub mod chats{
     use crate::schema::{chats, chat_members, users};
-    use crate::models::{Chat, User};
+    use crate::models::{Chat, ChatMember, User};
     use diesel::prelude::*;
 
     pub fn get_chat_ids_of_user(conn: &mut SqliteConnection, user_id: i32) -> QueryResult<Vec<i32>>{
@@ -44,5 +44,15 @@ pub mod chats{
                     .map(|(user_id, u)| ChatMemberInfo { user_id, username:u })
                     .collect()
             })
+    }
+    
+    pub fn is_user_in_chat(conn: &mut SqliteConnection, u_id: i32, c_id: i32) -> bool {
+        use crate::schema::chat_members::dsl::*;
+        
+        let res = chat_members
+            .filter(user_id.eq(u_id))
+            .filter(chat_id.eq(c_id))
+            .first::<ChatMember>(conn);
+        res.is_ok()
     }
 }
