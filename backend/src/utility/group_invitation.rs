@@ -6,6 +6,10 @@ pub(crate) mod group_invitation {
     use crate::models::GroupInvitation;
     use crate::utility::group_chat::group_chat::{is_user_part_of_group};
 
+    #[derive(serde::Deserialize)]
+    pub struct GroupInvitationQuery {
+        pub group_id: Option<i32>,
+    }
 
     #[derive(Deserialize, Clone, Debug)]
     pub(crate) struct GroupInvitationRequest {

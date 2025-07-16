@@ -52,6 +52,7 @@ pub mod chats{
 
 
     #[derive(serde::Deserialize, Clone, Debug, Insertable)]
+    #[diesel(table_name = chat_members)]
     pub struct InsertChatMember {
         chat_id: i32,
         user_id: i32,
@@ -60,11 +61,23 @@ pub mod chats{
     // aggiungi un membro a una chat
     pub fn add_member_to_chat(conn: &mut SqliteConnection, chat_id: i32, user_id: i32) -> QueryResult<()> {
         use crate::schema::chat_members::dsl as cm;
+        use crate::schema::group_invitation::dsl as gi;
 
         let new_member = InsertChatMember {
             chat_id,
             user_id,
         };
+
+        // controlla che effettivamente l'utentesia stato invitato a questa chat
+        let invitation_exists = gi::group_invitation
+            .filter(gi::group_id.eq(chat_id))
+            .filter(gi::receiver_id.eq(user_id))
+            .first::<crate::models::GroupInvitation>(conn)
+            .optional()?
+            .is_some();
+        if !invitation_exists {
+            return Err(diesel::result::Error::NotFound);
+        }
 
         diesel::insert_into(cm::chat_members)
             .values(&new_member)
