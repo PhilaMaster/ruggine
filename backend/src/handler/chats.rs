@@ -40,7 +40,7 @@ pub mod chats{
             })))
             }
         }else {
-            Ok(actix_web::HttpResponse::Unauthorized().json(serde_json::json!({
+            Ok(HttpResponse::Unauthorized().json(serde_json::json!({
                 "status": 401,
                 "error": "Unauthorized access"
             })))

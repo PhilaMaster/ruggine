@@ -45,7 +45,9 @@ class LocalData{
 
   //store all chats and messages in a local database
   static Future<List<Chat>> getStoredChats(String uid) async {
-    final box = await Hive.openBox<Chat>(uid + kChatsBox);
+    final box = await Hive.openBox<Chat>(uid + kChatsBox).catchError( (_) {
+      return Hive.openBox<Chat>(uid + kChatsBox);
+    });
     if (kDebugMode) {
       print("Storage| Retrieved ${box.length} chats from local storage.");
     }
@@ -136,9 +138,9 @@ class LocalData{
     final userId = await _getUserId();
     final box = await Hive.openBox<Chat>(userId + kChatsBox);
     if (box.containsKey(chatId)) {
-      final chat = box.get(chatId);
+      var chat = box.get(chatId);
       if (chat != null) {
-        chat.newMessages = 0; // Reset unread count
+        chat = chat.copyWith(newMessages: 0);
         await box.put(chatId, chat);
         if (kDebugMode) {
           print("Storage| Unread count reset for chat: $chatId");

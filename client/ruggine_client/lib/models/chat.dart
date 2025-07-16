@@ -12,11 +12,26 @@ class Chat {
   final String? lastMessage;
   @HiveField(3)
   final DateTime lastTime;
-
-  int newMessages = 0;
+  @HiveField(4)
+  final int newMessages; // Number of new messages since last read
+  @HiveField(5)
+  final String? name; // Optional group name for group chats
+  @HiveField(6)
+  final String created_by;
+  @HiveField(7)
+  final List<String> members;
+  @HiveField(8)
+  final bool is_group;
+  @HiveField(9)
+  final DateTime created_at;
 
 
   Chat({
+    this.name,
+    required this.is_group,
+    required this.created_by,
+    required this.created_at,
+    required this.members,
     required this.id,
     required this.lastSender,
     required this.lastMessage,
@@ -24,26 +39,24 @@ class Chat {
     this.newMessages = 0,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'lastSender': lastSender,
-      'lastMessage': lastMessage,
-      'lastTime': lastTime.toIso8601String(),
-    };
-  }
   factory Chat.fromJson(Map<String, dynamic> json) {
     return Chat(
-      id: json['id'] ?? '',
+      id: json['id'].toString(),
       lastSender: json['lastSender'] ?? '',
       lastMessage: json['lastMessage'],
       lastTime: DateTime.parse(json['lastTime'] ?? DateTime.now().toIso8601String()),
+      newMessages: json['newMessages'] ?? 0,
+      name: json['name'],
+      created_by: json['created_by'].toString(),
+      members: List<String>.from(json['members'] ?? []),
+      is_group: json['is_group'] ?? false,
+      created_at: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
     );
   }
 
   @override
   String toString() {
-    return 'Chat(id: $id, lastSender: $lastSender, lastMessage: $lastMessage, lastTime: $lastTime, newMessages: $newMessages)';
+    return 'Chat(id: $id, lastSender: $lastSender, lastMessage: $lastMessage, lastTime: $lastTime, newMessages: $newMessages, name: $name, created_by: $created_by, members: $members, is_group: $is_group, created_at: $created_at)';
   }
 
   @override
@@ -60,6 +73,7 @@ class Chat {
     String? lastMessage,
     DateTime? lastTime,
     int? newMessages,
+    String? created_by,
   }) {
     return Chat(
       id: id ?? this.id,
@@ -67,11 +81,32 @@ class Chat {
       lastMessage: lastMessage ?? this.lastMessage,
       lastTime: lastTime ?? this.lastTime,
       newMessages: newMessages ?? this.newMessages,
+      name: name,
+      created_by: created_by ?? this.created_by,
+      members: List<String>.from(members),
+      // Copy members list
+      is_group: is_group ?? false,
+      created_at: created_at,
     );
   }
 
   @override
   int get hashCode => id.hashCode;
+
+  toJson() {
+    return {
+      'id': id,
+      'lastSender': lastSender,
+      'lastMessage': lastMessage,
+      'lastTime': lastTime.toIso8601String(),
+      'newMessages': newMessages,
+      'name': name,
+      'created_by': created_by,
+      'members': members,
+      'is_group': is_group,
+      'created_at': created_at.toIso8601String(),
+    };
+  }
 
 
 

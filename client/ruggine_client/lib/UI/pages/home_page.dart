@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
 import 'package:ruggine_client/UI/providers/invites_provider.dart';
 import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
 import '../../models/chat.dart';
@@ -395,11 +396,16 @@ class HomePage extends ConsumerWidget {
     final chatz = ref.read(chatProvider.notifier);
     chatz.addChat(
       Chat(
-        id: (chatz.length + 1).toString(),
-        lastSender: "Zio Pera",
-        lastMessage: null,
-        lastTime: DateTime.now(),
-        newMessages: 10,
+          id: (chatz.length + 1).toString(),
+          lastSender: "Zio Pera",
+          lastMessage: null,
+          lastTime: DateTime.now(),
+          newMessages: 10,
+          name: "Gruppo di Zio Pera",
+          created_by: "Zio Pera",
+          members: ["Zio Pera"],
+          is_group: true,
+          created_at: DateTime.now()
       ),
     );
     showDialog(
@@ -417,16 +423,19 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  void handleNewMessage(BuildContext context, WidgetRef ref) {
-    final messagesNotifier = ref.read(msgProvider.notifier);
-    messagesNotifier.updateMessages('1', [
-      Message(
-          id: '10',
-          senderName: 'Zio Pera',
-          content: 'Ciao, questo è un messaggio di prova!',
-          timestamp: DateTime.now(),
-          chatId: '1'
-      ),
-    ]);
+  Future<void> handleNewMessage(BuildContext context, WidgetRef ref) async {
+
+    await Hive.deleteFromDisk(); // Reset messages for testing
+
+    // final messagesNotifier = ref.read(msgProvider.notifier);
+    // messagesNotifier.updateMessages('1', [
+    //   Message(
+    //       id: '10',
+    //       senderName: 'Zio Pera',
+    //       content: 'Ciao, questo è un messaggio di prova!',
+    //       timestamp: DateTime.now(),
+    //       chatId: '1'
+    //   ),
+    // ]);
   }
 }

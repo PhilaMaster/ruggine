@@ -83,6 +83,30 @@ class ChatsRepo {
       throw Exception('Error resetting unread count: $e');
     }
   }
+
+  Future<Chat> getChatInfo(String chatId) async {
+    try {
+      final response = await _apiClient.getChatInfo(chatId);
+      var chat = Chat.fromJson(response.data['chat']);
+      final creator = response.data['members'].firstWhere(
+        (member) => member['user_id'] == int.parse(chat.created_by),
+        orElse: () => 'unknown',
+      );
+
+      chat.members.addAll(
+        (response.data['members'] as List).map((member) => member['username'] as String).toList(),
+      );
+      chat = chat.copyWith(
+        created_by: creator['username']
+      );
+      if (kDebugMode) {
+        print("Chat info retrieved: ${chat.id}");
+      }
+      return chat;
+    } catch (e) {
+      throw Exception('Error fetching chat info: $e');
+    }
+  }
 }
 
 

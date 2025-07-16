@@ -112,7 +112,18 @@ class ApiClient {
       print("Accepting invite: $inviteId");
     }
     //assume group info are returned
-    final chatInfo = Chat(id: '12345', lastSender: "ricevuto_da_invito", lastMessage: null, lastTime: DateTime.now());
+    final chatInfo = Chat(
+      id: inviteId,
+      lastSender: 'Reba',
+      lastMessage: 'Welcome to the group!',
+      lastTime: DateTime.now(),
+      newMessages: 0,
+      name: 'The Sussoni',
+      created_by: 'Reba',
+      members: ['Reba', 'Sandro', 'John'],
+      is_group: true,
+      created_at: DateTime.now(),
+    );
     return Future<Response<dynamic>>.value(
       Response(
         requestOptions: RequestOptions(path: 'path accept invite'),
@@ -211,5 +222,20 @@ class ApiClient {
         'since': lastUpdate.toIso8601String(),
       },
     );
+  }
+
+  Future<Response> getChatInfo(String chatId) async {
+    if (kDebugMode) {
+      print("Fetching chat info for chat ID: $chatId");
+    }
+    final response = await dio.get(
+      '$apipath_chat_info',
+      queryParameters: {'chat_id': chatId},
+    );
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      throw Exception('Failed to load chat info');
+    }
   }
 }
