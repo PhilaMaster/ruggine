@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ruggine_client/core/storage.dart';
 import 'package:ruggine_client/data/messages_repo.dart';
 import '../../data/api_client.dart';
 import '../../models/message.dart';
@@ -39,6 +40,10 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
     final uniqueMessages = messages.toSet().toList();
     uniqueMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return uniqueMessages;
+  }
+
+  Future<void> loadNewMessages() async {
+    final lastUpdate = LocalData.getLastMessage();
   }
 
   Future<void> loadMessages(String chatId) async {

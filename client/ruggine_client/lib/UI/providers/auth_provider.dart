@@ -62,7 +62,6 @@ class AuthNotifier extends StateNotifier<User?> {
     try {
       // Il WebSocket si connetterà automaticamente grazie al listener nel WebSocketNotifier
 
-      //TODO Recupera le chat dell'utente
       if (kDebugMode) {
         print('Inizializzazione sessione utente: ${state?.username}');
       }
@@ -78,7 +77,7 @@ class AuthNotifier extends StateNotifier<User?> {
   // Pulisce risorse quando l'utente si disconnette
   Future<void> _cleanupUserSession() async {
     try {
-      //eventuale pulizia delle risorse WebSocket
+
     } catch (e) {
       if (kDebugMode) {
         print('Errore durante la pulizia della sessione: $e');
