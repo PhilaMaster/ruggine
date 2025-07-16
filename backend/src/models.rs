@@ -23,7 +23,7 @@ pub struct ChatMember {
 pub struct Chat {
     pub id: i32,
     pub is_group: bool,
-    pub name: Option<String>,//null if private chat
+    pub name: Option<String>,//null se la chat è privata
     pub created_by: i32,
     pub created_at: String,
 }
@@ -37,21 +37,6 @@ pub struct GroupInvitation {
     pub receiver_id: i32,
 }
 
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
-#[diesel(table_name = group_message)]
-pub struct GroupMessage {
-    pub id: Option<i32>,
-    pub text: String,
-    pub sender_id: i32,
-    pub group_rx_id: i32,
-    pub sent_at: String,
-}
-
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
-pub struct Group {
-    pub id: Option<i32>,
-    pub name: String,
-}
 
 #[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = messages)]
@@ -64,24 +49,7 @@ pub struct Message {
 }
 
 #[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
-#[diesel(table_name = private_message)]
-pub struct PrivateMessage {
-    pub id: i32,
-    pub text: String,
-    pub sender_id: i32,
-    pub receiver_id: i32,
-    pub sent_at: String,
-}
-
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
-#[diesel(table_name = user_in_group)]
-#[diesel(primary_key(group_id, user_id))]
-pub struct UserInGroup {
-    pub group_id: i32,
-    pub user_id: i32,
-}
-
-#[derive(Queryable, Debug, Identifiable, Serialize, Deserialize, Selectable)]
+#[diesel(table_name = users)]
 pub struct User {
     pub id: i32,
     pub username: String,

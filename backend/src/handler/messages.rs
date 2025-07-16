@@ -1,28 +1,22 @@
 pub mod messages {
     use actix_web::{web, HttpMessage, HttpRequest};
+    use serde::Deserialize;
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::chats::chats::is_user_in_chat;
     use crate::utility::connection::establish_connection;
-    use crate::utility::group::group::{is_user_part_of_group, CreateGroupRequest};
-    use crate::utility::messages::messages::{get_new_messages_since, send_message, SendMessageRequest};
+    use crate::utility::group_chat::group_chat::{is_user_part_of_group, CreateGroupRequest};
+    use crate::utility::messages::messages::{get_new_messages_since, send_message, GetNewMessagesQuery, SendMessageRequest};
 
-    pub async fn get_new_messages_since_handler(req: HttpRequest) -> actix_web::Result<actix_web::HttpResponse> {
+    // ottiene i nuovi messaggi da una chat o gruppo
+    pub async fn get_new_messages_since_handler(req: HttpRequest, query: web::Query<GetNewMessagesQuery>) -> actix_web::Result<actix_web::HttpResponse> {
         let mut conn = establish_connection();
 
         if let Some(claims) = req.extensions().get::<Claims>() {
             //recupera la data dal query param (esempio: ?since=2025-07-01T00:00:00)
-            let since = req.query_string()
-                .split('&')
-                .find_map(|kv| {
-                    let mut parts = kv.split('=');
-                    if parts.next()? == "since" {
-                        parts.next().map(|v| v.to_string())
-                    } else {
-                        None
-                    }
-                })
+            let since = query.since
+                .clone()
                 .unwrap_or_else(|| "1970-01-01T00:00:00".to_string());//prende tutti i messaggi se non viene specificato un valore
-            
+
 
             match get_new_messages_since(&mut conn, claims.user_id, since) {
                 Ok(messages) => Ok(actix_web::HttpResponse::Ok().json(messages)),

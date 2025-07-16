@@ -1,8 +1,8 @@
-pub mod group {
+pub mod group_chat {
     use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::connection::establish_connection;
-    use crate::utility::group::group::{get_all_groups_of_a_user, create_group, CreateGroupRequest};
+    use crate::utility::group_chat::group_chat::{create_group, CreateGroupRequest};
 
     // pub async fn get_all_groups_of_a_user_handler(req: HttpRequest) ->  actix_web::Result<HttpResponse> {
     //     let mut conn = establish_connection();

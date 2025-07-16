@@ -1,8 +1,9 @@
 pub mod group_invitation {
     use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
     use crate::utility::authorization::authorization::Claims;
+    use crate::utility::chats::chats::is_user_in_chat;
     use crate::utility::connection::establish_connection;
-    use crate::utility::group::group::{get_group_by_name};
+    use crate::utility::group_chat::group_chat::{get_group_by_name};
     use crate::utility::group_invitation::group_invitation::{get_user_group_invitations, create_group_invitation, GroupInvitationRequest};
     use crate::utility::user::user::get_user_by_username;
 
@@ -25,26 +26,16 @@ pub mod group_invitation {
 
     pub async fn create_group_invitation_handler(req: HttpRequest, invitation_data: web::Json<GroupInvitationRequest>) -> actix_web::Result<HttpResponse> {
         let mut conn = establish_connection();
-
-        let rec_username = invitation_data.receiver_username.clone();
-
-        let rec_user_id = match get_user_by_username(&mut conn, &rec_username) {
-            Ok(user) => user.id,
-            Err(_) => {
-                return Ok(HttpResponse::NotFound().json(format!("Username {} not found", &rec_username)));
-            }
-        };
-
-        let group_name = invitation_data.group_name.clone();
-        let group_id = match get_group_by_name(&mut conn, group_name.clone()) {
-            Ok(group) => group.id,
-            Err(_) => {
-                return Ok(HttpResponse::NotFound().json(format!("Group {} not found", &group_name)));
-            }
-        };
+        
         // richiede login, quindi serve ottenere i claims
         if let Some(claims) = req.extensions().get::<Claims>() {
-            match create_group_invitation(&mut conn, group_id, claims.user_id, rec_user_id) {
+            if !is_user_in_chat(&mut conn, claims.user_id, invitation_data.chat_id) {
+                return Ok(HttpResponse::Forbidden().body("User is not part of the chat"));
+            }
+            if is_user_in_chat(&mut conn, invitation_data.receiver_id, invitation_data.chat_id) {
+                return Ok(HttpResponse::BadRequest().body("Receiver is already part of the chat"));
+            }
+            match create_group_invitation(&mut conn, invitation_data.chat_id, claims.user_id, invitation_data.receiver_id) {
                 Ok(_) => {
                     Ok(HttpResponse::Created().finish())
                 },

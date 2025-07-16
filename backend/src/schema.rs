@@ -27,16 +27,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    group_message (id) {
-        id -> Nullable<Integer>,
-        text -> Text,
-        sender_id -> Integer,
-        group_rx_id -> Integer,
-        sent_at -> Text,
-    }
-}
-
-diesel::table! {
     groups (id) {
         id -> Nullable<Integer>,
         name -> Text,
@@ -54,23 +44,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    private_message (id) {
-        id -> Integer,
-        text -> Text,
-        sender_id -> Integer,
-        receiver_id -> Integer,
-        sent_at -> Text,
-    }
-}
-
-diesel::table! {
-    user_in_group (group_id, user_id) {
-        group_id -> Integer,
-        user_id -> Integer,
-    }
-}
-
-diesel::table! {
     users (id) {
         id -> Integer,
         username -> Text,
@@ -82,21 +55,14 @@ diesel::joinable!(chat_members -> chats (chat_id));
 diesel::joinable!(chat_members -> users (user_id));
 diesel::joinable!(chats -> users (created_by));
 diesel::joinable!(group_invitation -> groups (group_id));
-diesel::joinable!(group_message -> groups (group_rx_id));
-diesel::joinable!(group_message -> users (sender_id));
 diesel::joinable!(messages -> chats (chat_id));
 diesel::joinable!(messages -> users (sender_id));
-diesel::joinable!(user_in_group -> groups (group_id));
-diesel::joinable!(user_in_group -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     chat_members,
     chats,
     group_invitation,
-    group_message,
     groups,
     messages,
-    private_message,
-    user_in_group,
     users,
 );
