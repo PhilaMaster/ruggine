@@ -1,4 +1,5 @@
 pub(crate) mod group_invitation {
+    use std::sync::mpsc::Receiver;
     use diesel::{ExpressionMethods, Insertable, QueryDsl, QueryResult, RunQueryDsl, SqliteConnection};
     use serde::Deserialize;
     use crate::schema::{group_invitation};
@@ -8,8 +9,8 @@ pub(crate) mod group_invitation {
 
     #[derive(Deserialize, Clone, Debug)]
     pub(crate) struct GroupInvitationRequest {
-        pub(crate) group_name: String,
-        pub(crate) receiver_username: String,
+        pub(crate) receiver_id: i32,
+        pub(crate) chat_id: i32,
     }
 
     #[derive(Insertable)]
@@ -37,10 +38,7 @@ pub(crate) mod group_invitation {
             sender_id,
             receiver_id,
         };
-
-        // controlla che l'utente che crea l'invito sia effettivamente un membro del gruppo
-        is_user_part_of_group(conn, sender_id,group_id)?;
-
+        
         diesel::insert_into(group_invitation::table)
             .values(&new_invitation)
             .execute(conn)?;
