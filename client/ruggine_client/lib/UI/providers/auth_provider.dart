@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ruggine_client/UI/providers/messages_provider.dart';
 import '../../data/api_client.dart';
 import '../../data/auth_repo.dart';
 import '../../models/user.dart';
@@ -31,7 +32,7 @@ class AuthNotifier extends StateNotifier<User?> {
     } else {
       state = user;
       // Inizializza WebSocket e recupera messaggi se l'utente è già autenticato
-      await _initializeUserSession();
+      await _initializeUserSession(user.id);
     }
   }
 
@@ -46,7 +47,7 @@ class AuthNotifier extends StateNotifier<User?> {
     } else {
       state = user;
       // Inizializza WebSocket e recupera messaggi dopo login riuscito
-      await _initializeUserSession();
+      await _initializeUserSession(user.id);
     }
   }
 
@@ -58,16 +59,18 @@ class AuthNotifier extends StateNotifier<User?> {
   }
 
   // Inizializza WebSocket e recupera dati dell'utente
-  Future<void> _initializeUserSession() async {
+  Future<void> _initializeUserSession(String uid) async {
     try {
       // Il WebSocket si connetterà automaticamente grazie al listener nel WebSocketNotifier
-
+      //TODO start websocket connection
+      //TODO load stored invites
+      await ref.read(chatProvider.notifier).loadLocalChats(uid);
+      await ref.read(msgProvider.notifier).loadNewMessages(uid);
       if (kDebugMode) {
         print('Inizializzazione sessione utente: ${state?.username}');
       }
-
       // Recupera gli inviti pending
-      ref.read(invitesProvider.notifier).loadInvites();
+      ref.read(invitesProvider.notifier).loadInvites(uid);
     } catch (e) {
       // Gestisci errori di inizializzazione
       print('Errore durante l\'inizializzazione della sessione: $e');

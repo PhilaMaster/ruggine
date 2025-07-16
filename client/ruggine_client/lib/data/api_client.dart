@@ -22,7 +22,13 @@ class ApiClient {
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final token = await SecureStorage.readToken();
+        if (kDebugMode) {
+          print('Requesting: ${options.method} ${options.path}');
+        }
         if (token != null) {
+          if (kDebugMode) {
+            print('Adding Authorization header with token: $token');
+          }
           options.headers['Authorization'] = 'Bearer $token';
         }
         return handler.next(options);
@@ -79,7 +85,7 @@ class ApiClient {
     );
   }
 
-  Future<Response> getInvites() {
+  Future<Response> getInvites(String uid) {
     //for now return fake invites
     return Future<Response<dynamic>>.value(
       Response(
@@ -169,16 +175,17 @@ class ApiClient {
     if (kDebugMode) {
       print("Sending message to chat $chatId: $content");
     }
-    return Future<Response<dynamic>>.value(
-      Response(
-        requestOptions: RequestOptions(path: 'path send message'),
+    return dio.post(
+        apipath_send_msg,
         data: {
-          'id' : '3',
-          'senderName': 'pasquale', // Replace with actual user name
+          'chat_id': int.parse(chatId),
           'content': content,
-          'timestamp': DateTime.now().toIso8601String(),
         },
-      ),
+        options: Options(
+          headers: {
+            HttpHeaders.contentTypeHeader: 'application/json',
+          },
+        )
     );
   }
 
@@ -190,5 +197,19 @@ class ApiClient {
         Uri.parse(websocketUrl),
         );
     await webSocket.ready;
+  }
+
+  Future<Response> getNewMessages(DateTime? lastUpdate) async {
+    if (lastUpdate == null) {
+      return dio.get(
+        apipath_new_messages
+      );
+    }
+    return dio.get(
+      apipath_new_messages,
+      queryParameters: {
+        'since': lastUpdate.toIso8601String(),
+      },
+    );
   }
 }

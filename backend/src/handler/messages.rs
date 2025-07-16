@@ -37,7 +37,8 @@ pub mod messages {
         let mut conn = establish_connection();
 
         if let Some(claims) = req.extensions().get::<Claims>() {
-            //controllo che l'utente faccia parte della chat 
+            //controllo che l'utente faccia parte della chat
+            println!("User ID: {}, Chat ID: {}, Content: {}", claims.user_id, message_data.chat_id, message_data.content);
             if !is_user_in_chat(&mut conn, claims.user_id, message_data.chat_id){
                 return Ok(actix_web::HttpResponse::Forbidden().json(serde_json::json!({
                     "status": 403,

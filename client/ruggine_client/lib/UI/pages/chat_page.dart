@@ -65,7 +65,6 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       try {
         // Remove the resetState call - let loadLocalMessages handle the state
         await msgRepo.loadLocalMessages(widget.chat.id);
-        await msgRepo.loadMessages(widget.chat.id);
       } finally {
         ref.read(chatProvider.notifier).resetUnreadCount(widget.chat.id);
         if (mounted) {

@@ -24,9 +24,7 @@ class InvitesNotifier extends StateNotifier<List<Invite>?> {
   final InvitesRepo _repo;
   final ChatsNotifier _chatsNotifier;
 
-  InvitesNotifier(this._repo, this._chatsNotifier) : super(null) {
-    loadInvites();
-  }
+  InvitesNotifier(this._repo, this._chatsNotifier) : super(null) {}
 
   List<Invite> sortInvites(List<Invite> invites) {
     return invites..sort((a, b) => a.groupName.compareTo(b.groupName));
@@ -59,9 +57,9 @@ class InvitesNotifier extends StateNotifier<List<Invite>?> {
     }
   }
 
-  Future<void> loadInvites() async {
+  Future<void> loadInvites(String uid) async {
     try {
-      final invites = await _repo.getInvites();
+      final invites = await _repo.getInvites(uid);
       if (invites.isNotEmpty) {
         state = sortInvites(invites);
       } else {

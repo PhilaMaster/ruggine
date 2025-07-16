@@ -5,6 +5,7 @@ import 'package:ruggine_client/UI/providers/invites_provider.dart';
 import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
 import '../../models/chat.dart';
 import '../../models/invite.dart';
+import '../../models/message.dart';
 import '../providers/chats_provider.dart';
 import '../providers/messages_provider.dart';
 
@@ -418,6 +419,14 @@ class HomePage extends ConsumerWidget {
 
   void handleNewMessage(BuildContext context, WidgetRef ref) {
     final messagesNotifier = ref.read(msgProvider.notifier);
-    messagesNotifier.loadMessages("1"); //for testing purposes it aways returns 2 new messages
+    messagesNotifier.updateMessages('1', [
+      Message(
+          id: '10',
+          senderName: 'Zio Pera',
+          content: 'Ciao, questo è un messaggio di prova!',
+          timestamp: DateTime.now(),
+          chatId: '1'
+      ),
+    ]);
   }
 }

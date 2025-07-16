@@ -22,17 +22,7 @@ final chatProvider = StateNotifierProvider<ChatsNotifier, List<Chat>?>((ref) {
 class ChatsNotifier extends StateNotifier<List<Chat>?> {
   final ChatsRepo _repo;
 
-  ChatsNotifier(this._repo) : super(null) {
-    _loadLocalChats().then((_) {
-      if (state != null && state!.isNotEmpty) {
-        // Load new chats excluding those already in state
-        loadNewChats(state!.map((chat) => chat.id).toList());
-      } else {
-        // If no local chats, just load new chats
-        loadNewChats([]);
-      }
-    });
-  }
+  ChatsNotifier(this._repo) : super(null) {}
 
   List<Chat> sortChats(List<Chat> chats) {
     return chats..sort((a, b) => b.lastTime.compareTo(a.lastTime));
@@ -47,9 +37,9 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     return state![index];
   }
 
-  Future<void> _loadLocalChats() async {
+  Future<void> loadLocalChats(String uid) async {
     try {
-      final chats = await _repo.getLocalChats();
+      final chats = await _repo.getLocalChats(uid);
       if (chats.isNotEmpty) {
         state = sortChats(chats);
       } else {
@@ -139,7 +129,8 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     }
   }
   
-  Future<void> updateLastMessage(String chatId, Message? msg) async {
+  Future<void> updateLastMessage(String chatId, Message? msg,
+      {int unreadCount = 0}) async {
     try {
       if (state != null) {
         final index = state!.indexWhere((chat) => chat.id == chatId);
@@ -155,6 +146,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
               lastSender: msg.senderName,
               lastMessage: msg.content,
               lastTime: msg.timestamp,
+              newMessages: unreadCount,
             );
           }
         }else{
@@ -163,10 +155,12 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
             lastSender: msg?.senderName ?? '',
             lastMessage: msg?.content,
             lastTime: msg?.timestamp ?? DateTime.now(),
+            newMessages: unreadCount,
           ));
         }
         state = sortChats(state!);
-        await _repo.saveChats([state![index]]);
+        final newindex = state!.indexWhere((chat) => chat.id == chatId);
+        await _repo.saveChats([state![newindex]]);
       }
     } catch (e) {
       if (kDebugMode) {
