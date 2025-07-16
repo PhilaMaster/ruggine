@@ -93,7 +93,7 @@ class MyApp extends ConsumerWidget {
     final themeMode = ref.watch(themeNotifierProvider);
     final router = ref.watch(routerProvider);
     // Inizializza il WebSocketProvider per mantenerlo attivo
-    ref.watch(webSocketProvider);
+    //ref.watch(webSocketProvider);
 
     return MaterialApp.router(
       title: 'Ruggine Chat',

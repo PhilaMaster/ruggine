@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 part 'message.g.dart';
@@ -13,29 +14,38 @@ class Message {
   final DateTime timestamp;
   @HiveField(3)
   final String senderName;
+  @HiveField(4)
+  final String chatId;
 
   Message({
     required this.id,
     required this.content,
     required this.timestamp,
     required this.senderName,
+    required this.chatId,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'content': content,
-      'timestamp': timestamp.toIso8601String(),
+      'sent_at': timestamp.toIso8601String(),
       'senderName': senderName,
+      'chat_id': chatId,
     };
   }
 
   factory Message.fromJson(Map<String, dynamic> json) {
+    if (kDebugMode) {
+      print("Creating Message from JSON: $json");
+    }
     return Message(
       id: json['id'].toString(),
       content: json['content'],
-      timestamp: DateTime.parse(json['timestamp']),
-      senderName: json['senderName'] ?? 'Unknown Sender',
+      timestamp: DateTime.parse(json['sent_at']),
+      senderName: json['username'] ?? json['sender_id'].toString() ??
+          'Unknown Sender',
+      chatId: json['chat_id'].toString(),
     );
   }
 
@@ -53,5 +63,15 @@ class Message {
 
   @override
   int get hashCode => id.hashCode;
+
+  Message copyWith({required String senderName}) {
+    return Message(
+      id: id,
+      content: content,
+      timestamp: timestamp,
+      senderName: senderName,
+      chatId: chatId,
+    );
+  }
 
 }

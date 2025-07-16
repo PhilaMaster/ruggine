@@ -9,9 +9,9 @@ class InvitesRepo {
 
   InvitesRepo(this._apiClient);
 
-  Future<List<Invite>> getInvites() async {
+  Future<List<Invite>> getInvites(String uid) async {
     try {
-      final response = await _apiClient.getInvites();
+      final response = await _apiClient.getInvites(uid);
       if (kDebugMode) {
         print("Retrieved ${response.data.length} invites from API.");
       }

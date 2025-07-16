@@ -26,11 +26,10 @@ class AuthRepo{
   //   return "Login successful";
   // }
 
-  Future<User> login(String username, String password) async {
+  Future<User?> login(String username, String password) async {
     if (kDebugMode) {
       print("Attempting to login with username: $username");
     }
-
     String? token;
     try {
       await _apiClient.login(username, password).then((response) {
@@ -39,7 +38,6 @@ class AuthRepo{
               'Login failed with status code: ${response.statusCode}');
         }
         token = response.data['token'];
-        SecureStorage.writeToken(token!);
       });
     }catch (e) {
       if (e is DioException) {
@@ -53,8 +51,9 @@ class AuthRepo{
       }
       throw LoginException('Login failed unexpectedly');
     }
-    if (token == null) throw Exception('Token non trovato');
+    if (token == null) return null;
     // Decodifica JWT per ottenere username e id
+    await SecureStorage.writeToken(token!);
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
     final userId = decodedToken['user_id']?.toString() ?? '';
     final userName = decodedToken['username'] ?? '';

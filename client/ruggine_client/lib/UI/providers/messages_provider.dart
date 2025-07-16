@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ruggine_client/UI/providers/auth_provider.dart';
+import 'package:ruggine_client/core/storage.dart';
 import 'package:ruggine_client/data/messages_repo.dart';
 import '../../data/api_client.dart';
 import '../../models/message.dart';
@@ -12,7 +14,8 @@ final messageRepositoryProvider = Provider<MessagesRepo>((ref) {
 final msgProvider = StateNotifierProvider<MessagesNotifier, List<Message>?>((ref){
   final repo = ref.read(messageRepositoryProvider);
   final chatNotifier = ref.read(chatProvider.notifier);
-  return (MessagesNotifier(repo, chatNotifier));
+  final authNotifier = ref.read(authProvider.notifier);
+  return (MessagesNotifier(repo, chatNotifier, authNotifier));
 });
 
 
@@ -21,9 +24,11 @@ final msgProvider = StateNotifierProvider<MessagesNotifier, List<Message>?>((ref
 class MessagesNotifier extends StateNotifier<List<Message>?> {
   final MessagesRepo _repo;
   final ChatsNotifier _chatNotifier;
+  final AuthNotifier _authNotifier;
   String? _chatId;
 
-  MessagesNotifier(this._repo, this._chatNotifier) : super(null) {}
+  MessagesNotifier(this._repo, this._chatNotifier, this._authNotifier)
+      : super(null);
 
   int get length => state?.length ?? 0;
 
@@ -41,33 +46,44 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
     return uniqueMessages;
   }
 
-  Future<void> loadMessages(String chatId) async {
-    try {
-      if (_chatId != null && _chatId != chatId) {
-        // Reset state if the chat ID changes
-        state = [];
-      }
-      _chatId = chatId; // Update the current chat ID
-      final messages = await _repo.getMessages(chatId);
-
-      if (messages.isNotEmpty) {
-        final lastMessage = messages.last;
-        // If state is null, initialize it with the messages
-        if (state != null) {
-          state = sortMessages([...?state, ...messages]);
-        } else {
-          state = messages;
-        }
-        if (lastMessage == state?.last) {
-          await _chatNotifier.updateLastMessage(chatId, lastMessage);
-        }
-        await _chatNotifier.setUnreadCount(chatId, messages.length);
-      } else if (state == null) {
-        state = [];
-      }
-    } catch (e) {
+  Future<void> loadNewMessages(String uid) async {
+    final lastUpdate = await LocalData.getLastMessage(uid);
+    final Map<String, List<Message>> newMessages = await _repo.retrieveNewMessages(lastUpdate);
+    LocalData.setLastMessage(DateTime.now());
+    if (newMessages.isEmpty) {
       if (kDebugMode) {
-        print("Error loading messages: $e");
+        print("No new message pending.");
+      }
+      return;
+    }
+    for (var chat in newMessages.entries) {
+      final chatId = chat.key;
+      final msglist = chat.value;
+      msglist.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      await _repo.saveMessages(chatId, msglist);
+      await updateMessages(chatId, msglist);
+    }
+  }
+
+  Future<void> updateMessages(String chatId, List<Message> messages) async {
+    try {
+      bool currentChat = _chatId == chatId;
+      if (_chatId != null && currentChat) {
+        // im in the chat that received new messages display them
+        if (state == null) {
+          state = messages;
+        } else {
+          state = [...?state, ...messages];
+        }
+      }
+      if (messages.isNotEmpty) {
+        await _chatNotifier.updateLastMessage(chatId, messages.last,
+            unreadCount: currentChat ? 0 : messages.length);
+      }
+
+    }catch (e) {
+      if (kDebugMode) {
+        print("Error updating messages: $e");
       }
     }
   }
