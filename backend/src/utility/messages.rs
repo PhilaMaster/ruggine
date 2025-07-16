@@ -3,10 +3,6 @@ use serde::Deserialize;
 pub mod messages {
     use diesel::{QueryResult, SqliteConnection, ExpressionMethods, QueryDsl, RunQueryDsl, Insertable, Queryable, JoinOnDsl};
     use serde::{Deserialize, Serialize};
-    // use crate::models::Message;
-    // use crate::schema::{messages};
-    // use crate::schema::messages::dsl::messages;
-    // use crate::schema::users::dsl::users;
     use crate::utility::chats::chats::get_chat_ids_of_user;
     use crate::schema::{messages, users};
     use crate::models::{Message, User};
@@ -67,4 +63,11 @@ pub mod messages {
         sender_id: i32,
         content: String
     }
+
+    // struct per i parametri query della richiesta
+    #[derive(Deserialize)]
+    pub struct GetNewMessagesQuery {
+        pub since: Option<String>
+    }
+
 }

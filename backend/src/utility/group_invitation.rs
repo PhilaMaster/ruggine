@@ -3,7 +3,8 @@ pub(crate) mod group_invitation {
     use serde::Deserialize;
     use crate::schema::{group_invitation};
     use crate::models::GroupInvitation;
-    use crate::utility::group::group::{get_all_groups_of_a_user, is_user_part_of_group};
+    use crate::utility::group_chat::group_chat::{is_user_part_of_group};
+
 
     #[derive(Deserialize, Clone, Debug)]
     pub(crate) struct GroupInvitationRequest {

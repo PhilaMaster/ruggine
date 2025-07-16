@@ -11,7 +11,7 @@ mod utility {
     pub mod connection;
     pub mod user;
     pub mod messages;
-    pub mod group;
+    pub mod group_chat;
     pub mod group_invitation;
     pub mod chats;
 }
@@ -23,7 +23,7 @@ mod handler {
     // pub mod private_messages;
     pub mod messages;
     // pub mod group_message;
-    pub mod group;
+    pub mod group_chat;
     pub mod group_invitation;
     pub mod chats;
     pub mod websocket;
@@ -42,7 +42,7 @@ use crate::handler::chats::chats::get_chat_info_handler;
 use crate::handler::user::user::{create_user_handler, get_users_handler};
 use crate::middleware::authentication_middleware::AuthMiddleware;
 // use crate::handler::private_messages::private_messages::{get_private_messages_handler, send_private_message_handler};
-use crate::handler::group::group::{create_group_handler};
+use crate::handler::group_chat::group_chat::{create_group_handler};
 use crate::handler::group_invitation::group_invitation::{create_group_invitation_handler, delete_group_invitation_handler, get_user_group_invitations_handler};
 // use crate::handler::group_message::group_message::{get_all_group_messages_handler, send_group_message_handler};
 use crate::handler::websocket;

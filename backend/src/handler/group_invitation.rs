@@ -2,7 +2,7 @@ pub mod group_invitation {
     use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::connection::establish_connection;
-    use crate::utility::group::group::{get_group_by_name};
+    use crate::utility::group_chat::group_chat::{get_group_by_name};
     use crate::utility::group_invitation::group_invitation::{get_user_group_invitations, create_group_invitation, GroupInvitationRequest};
     use crate::utility::user::user::get_user_by_username;
 
