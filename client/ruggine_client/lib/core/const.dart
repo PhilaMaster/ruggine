@@ -13,8 +13,7 @@ const String apipath_chat_info = "chatInfo";
 
   // inviti
 const String apipath_invites = "groupInvites";
-const apipath_accept_invite = "groupInvites/accept";
-const apipath_decline_invite = "groupInvites";
+const String apipath_accept_invite = "groupInvites/accept";
 
 //Route constants
 const String route_login = "/login";

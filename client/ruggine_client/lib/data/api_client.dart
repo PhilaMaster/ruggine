@@ -161,17 +161,30 @@ class ApiClient {
     }
   }
 
-  Future<Response> sendInvite(String groupName) {
-    // Simulate sending an invite
-    if (kDebugMode) {
-      print("Sending invite to group: $groupName");
+  Future<Response> sendInvite(String groupName, String receiverName) async {
+    try {
+      if (kDebugMode) {
+        print("Sending invite to group: $groupName for receiver: $receiverName");
+      }
+      final response = await dio.post(
+        apipath_invites,
+        data: {
+          'group_name': groupName,
+          'receiver_name': receiverName,
+        },
+        options: Options(
+          headers: {
+            HttpHeaders.contentTypeHeader: 'application/json',
+          },
+        ),
+      );
+      return response;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error sending invite: $e');
+      }
+      rethrow;
     }
-    return Future<Response<dynamic>>.value(
-      Response(
-        requestOptions: RequestOptions(path: 'path send invite'),
-        data: {'status': 'sent', 'groupName': groupName},
-      ),
-    );
   }
 
   Future<Response> getMessages(String chatId) {

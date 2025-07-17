@@ -3,8 +3,9 @@ pub mod group_invitation {
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::chats::chats::{add_member_to_chat, is_user_in_chat};
     use crate::utility::connection::establish_connection;
-    use crate::utility::group_chat::group_chat::get_group_chat_info_new_member;
+    use crate::utility::group_chat::group_chat::{get_group_by_name, get_group_chat_info_new_member};
     use crate::utility::group_invitation::group_invitation::{get_user_group_invitations, create_group_invitation, GroupInvitationRequest, GroupInvitationQuery, delete_group_invitation};
+    use crate::utility::user::user::get_user_by_username;
 
     pub async fn get_user_group_invitations_handler(req: HttpRequest) -> actix_web::Result<HttpResponse> {
         let mut conn = establish_connection();
@@ -28,13 +29,18 @@ pub mod group_invitation {
         
         // richiede login, quindi serve ottenere i claims
         if let Some(claims) = req.extensions().get::<Claims>() {
-            if !is_user_in_chat(&mut conn, claims.user_id, invitation_data.chat_id) {
+
+            let chat_id = get_group_by_name(&mut conn, invitation_data.group_name.clone()).expect("Group by name not found").id;
+            let receiver_id = get_user_by_username(&mut conn, &invitation_data.receiver_name.clone()).expect("User by username not found").id;;
+
+
+            if !is_user_in_chat(&mut conn, claims.user_id, chat_id) {
                 return Ok(HttpResponse::Forbidden().body("L'utente non è parte del gruppo"));
             }
-            if is_user_in_chat(&mut conn, invitation_data.receiver_id, invitation_data.chat_id) {
+            if is_user_in_chat(&mut conn, receiver_id, chat_id) {
                 return Ok(HttpResponse::BadRequest().body("Il destinatario è già membro del gruppo"));
             }
-            match create_group_invitation(&mut conn, invitation_data.chat_id, claims.user_id, invitation_data.receiver_id) {
+            match create_group_invitation(&mut conn, chat_id, claims.user_id, receiver_id) {
                 Ok(_) => {
                     Ok(HttpResponse::Created().finish())
                 },

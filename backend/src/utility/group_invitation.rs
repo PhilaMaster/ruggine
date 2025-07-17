@@ -10,8 +10,8 @@ pub(crate) mod group_invitation {
 
     #[derive(Deserialize, Clone, Debug)]
     pub(crate) struct GroupInvitationRequest {
-        pub(crate) receiver_id: i32,
-        pub(crate) chat_id: i32,
+        pub(crate) receiver_name: String,
+        pub(crate) group_name: String,
     }
 
     #[derive(Insertable)]

@@ -47,11 +47,11 @@ class InvitesRepo {
     }
   }
 
-  Future<void> sendInvite(String groupName) async {
+  Future<void> sendInvite(String groupName, String receiverName) async {
     try {
-      final response = await _apiClient.sendInvite(groupName);
+      final response = await _apiClient.sendInvite(groupName, receiverName);
       if (kDebugMode) {
-        print("Invite sent to group: $groupName");
+        print("Invite sent to group: $groupName for receiver: $receiverName");
       }
     } catch (e) {
       throw Exception('Error sending invite: $e');
