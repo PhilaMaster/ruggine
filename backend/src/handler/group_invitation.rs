@@ -3,6 +3,7 @@ pub mod group_invitation {
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::chats::chats::{add_member_to_chat, is_user_in_chat};
     use crate::utility::connection::establish_connection;
+    use crate::utility::group_chat::group_chat::get_group_chat_info_new_member;
     use crate::utility::group_invitation::group_invitation::{get_user_group_invitations, create_group_invitation, GroupInvitationRequest, GroupInvitationQuery, delete_group_invitation};
 
     pub async fn get_user_group_invitations_handler(req: HttpRequest) -> actix_web::Result<HttpResponse> {
@@ -93,7 +94,9 @@ pub mod group_invitation {
             match add_member_to_chat(&mut conn, group_id, user_id) {
                 Ok(_) => {
                     delete_group_invitation(&mut conn, group_id, user_id).expect(" Errore durante l'eliminazione dell'invito");
-                    Ok(HttpResponse::NoContent().finish())
+                    Ok(HttpResponse::Accepted().json(serde_json::json!(
+                        get_group_chat_info_new_member(& mut conn, group_id).unwrap()
+                    )))
                 },
                 Err(diesel::NotFound) => {
                     Ok(HttpResponse::NotFound().body("Nessun invito per il gruppo richiesto"))

@@ -97,6 +97,7 @@ class ApiClient {
   }
 }
 
+/*
   Future<Response> acceptInvite(String inviteId) {
     // Simulate accepting an invite
     if (kDebugMode) {
@@ -122,18 +123,42 @@ class ApiClient {
       ),
     );
   }
+*/
 
-  Future<Response> declineInvite(String inviteId) {
-    // Simulate declining an invite
-    if (kDebugMode) {
-      print("Declining invite: $inviteId");
+  Future<Response> acceptInvite(String groupId) async {
+    try {
+      final response = await dio.post(
+        apipath_accept_invite,
+        queryParameters: {'group_id': int.parse(groupId)},
+      );
+      return response;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error accepting invite: $e');
+      }
+      rethrow;
     }
-    return Future<Response<dynamic>>.value(
-      Response(
-        requestOptions: RequestOptions(path: 'path decline invite'),
-        data: {'status': 'declined', 'inviteId': inviteId},
-      ),
-    );
+  }               
+
+  Future<Response> declineInvite(String groupId) async {
+    try {
+        // eliminare un invito non ritorna alcun body
+        await dio.delete(
+        apipath_invites,
+        queryParameters: {'group_id': int.parse(groupId)},
+      );
+      return Future<Response<dynamic>>.value(
+        Response(
+          requestOptions: RequestOptions(path: 'path decline invite'),
+          data: {'status': 'declined', 'inviteId': groupId},
+        ),  
+      );  
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error declining invite: $e');
+      }
+      rethrow;
+    }
   }
 
   Future<Response> sendInvite(String groupName) {

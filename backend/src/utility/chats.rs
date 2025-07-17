@@ -1,7 +1,23 @@
 pub mod chats{
+    use diesel::dsl::now;
     use crate::schema::{chats, chat_members, users};
-    use crate::models::{Chat, ChatMember, User};
+    use crate::models::{Chat, ChatMember, Message, User};
     use diesel::prelude::*;
+    use crate::utility::user::user::get_user_by_username;
+
+    #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
+    pub struct ChatInfo {
+        pub id: i32,                //group id
+        pub last_sender: String,
+        pub last_message: String,
+        pub last_time: String,
+        pub new_messages: i32,
+        pub name: String,           // group name
+        pub created_by: String,     // creator of the group non fattibile, sempre = "".to_string()
+        pub members: Vec<String>,
+        pub is_group: bool,
+        pub created_at: String,
+    }
 
     pub fn get_chat_ids_of_user(conn: &mut SqliteConnection, user_id: i32) -> QueryResult<Vec<i32>>{
         let chat_ids: Vec<i32> = chat_members::table
