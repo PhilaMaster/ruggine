@@ -11,6 +11,9 @@ const String apipath_new_messages = "chatMessages";
 const String apipath_send_msg = "sendMessage";
 const String apipath_chat_info = "chatInfo";
 
+  // inviti
+const String apipath_invites = "groupInvites";
+
 //Route constants
 const String route_login = "/login";
 const String route_home = "/";

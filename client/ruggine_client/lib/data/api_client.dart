@@ -83,28 +83,19 @@ class ApiClient {
         ],
       ),
     );
-  }
+    }
 
-  Future<Response> getInvites(String uid) {
-    //for now return fake invites
-    return Future<Response<dynamic>>.value(
-      Response(
-        requestOptions: RequestOptions(path: 'path invites'),
-        data: [
-          {
-            'groupName': 'The Sussoni',
-            'id': '1',
-            'senderName': 'Reba',
-          },
-          {
-            'groupName': 'The Cumarans',
-            'id': '2',
-            'senderName': 'Sandro',
-          },
-        ],
-      ),
-    );
+  Future<Response> getInvites(String uid) async {
+  try {
+    final response = await dio.get(apipath_invites);
+    return response;
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error getting invites: $e');
+    }
+    rethrow;
   }
+}
 
   Future<Response> acceptInvite(String inviteId) {
     // Simulate accepting an invite
