@@ -13,9 +13,9 @@ class Invite {
 
   Map<String, dynamic> toJson() {
     return {
-      'groupName': groupName,
+      'group_name': groupName,
       'id': id,
-      'senderName': senderName,
+      'sender_name': senderName,
     };
   }
 

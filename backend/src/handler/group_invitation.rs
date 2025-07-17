@@ -1,12 +1,9 @@
 pub mod group_invitation {
-    use actix::ActorStreamExt;
     use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::chats::chats::{add_member_to_chat, is_user_in_chat};
     use crate::utility::connection::establish_connection;
-    use crate::utility::group_chat::group_chat::{get_group_by_name};
     use crate::utility::group_invitation::group_invitation::{get_user_group_invitations, create_group_invitation, GroupInvitationRequest, GroupInvitationQuery, delete_group_invitation};
-    use crate::utility::user::user::get_user_by_username;
 
     pub async fn get_user_group_invitations_handler(req: HttpRequest) -> actix_web::Result<HttpResponse> {
         let mut conn = establish_connection();
