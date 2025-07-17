@@ -40,6 +40,9 @@ class AuthNotifier extends StateNotifier<User?> {
     return repo.getToken();
   }
 
+  String? get currentUsername => state?.username;
+  String? get currentUserId => state?.id;
+
   Future<void> login(String username, String password) async {
     final user = await repo.login(username, password);
     if (user == null) {

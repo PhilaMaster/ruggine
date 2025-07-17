@@ -49,7 +49,7 @@ class InvitesRepo {
 
   Future<void> sendInvite(String groupName, String receiverName) async {
     try {
-      final response = await _apiClient.sendInvite(groupName, receiverName);
+      await _apiClient.sendInvite(groupName, receiverName);
       if (kDebugMode) {
         print("Invite sent to group: $groupName for receiver: $receiverName");
       }

@@ -26,10 +26,9 @@ pub mod group_invitation {
 
     pub async fn create_group_invitation_handler(req: HttpRequest, invitation_data: web::Json<GroupInvitationRequest>) -> actix_web::Result<HttpResponse> {
         let mut conn = establish_connection();
-        
+
         // richiede login, quindi serve ottenere i claims
         if let Some(claims) = req.extensions().get::<Claims>() {
-
             let chat_id = get_group_by_name(&mut conn, invitation_data.group_name.clone()).expect("Group by name not found").id;
             let receiver_id = get_user_by_username(&mut conn, &invitation_data.receiver_name.clone()).expect("User by username not found").id;;
 

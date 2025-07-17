@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:ruggine_client/UI/providers/invites_provider.dart';
 import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
+import 'package:ruggine_client/UI/widgets/create_chat_dialog.dart';
 import '../../models/chat.dart';
 import '../../models/invite.dart';
 import '../../models/message.dart';
@@ -82,22 +83,6 @@ class HomePage extends ConsumerWidget {
                     icon: Icon(Icons.group_add),
                     label: Text("ricevi falso messaggio su gruppo 1"),
                     onPressed: () => handleNewMessage(context, ref),
-                  ):null,
-                ),
-                SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: isWide?
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.send_sharp),
-                    label: Text("Ricevi falso invito da Zio Pera"),
-                    onPressed: () => ref.read(invitesProvider.notifier).receiveInvite(
-                          Invite(
-                            groupName: "Gruppo di Zio Pera",
-                            id: "fake-invite-id",
-                            senderName: 'Zio Pera',
-                          ),
-                        ),
                   ):null,
                 ),
                 SizedBox(height: 12),
@@ -393,40 +378,13 @@ class HomePage extends ConsumerWidget {
   }
 
   void handleCreateGroup(BuildContext context, WidgetRef ref) {
-    final chatz = ref.read(chatProvider.notifier);
-    chatz.addChat(
-      Chat(
-          id: (chatz.length + 1).toString(),
-          lastSender: "Zio Pera",
-          lastMessage: null,
-          lastTime: DateTime.now(),
-          newMessages: 10,
-          name: "Gruppo di Zio Pera",
-          created_by: "Zio Pera",
-          members: ["Zio Pera"],
-          is_group: true,
-          created_at: DateTime.now()
-      ),
-    );
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-            title: Text("Crea gruppo"),
-            content: Text("Zio pera!"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: Text("OK"),
-              ),
-            ],
-          ),
+      builder: (context) => const CreateChatDialog(),
     );
   }
 
   Future<void> handleNewMessage(BuildContext context, WidgetRef ref) async {
-
-    await Hive.deleteFromDisk(); // Reset messages for testing
-
     // final messagesNotifier = ref.read(msgProvider.notifier);
     // messagesNotifier.updateMessages('1', [
     //   Message(

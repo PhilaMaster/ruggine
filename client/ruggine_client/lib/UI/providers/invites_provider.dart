@@ -101,5 +101,16 @@ class InvitesNotifier extends StateNotifier<List<Invite>?> {
     }
   }
 
+  Future<void> sendInvite(String receiver, String chatname) async {
+    try {
+      await _repo.sendInvite(chatname, receiver);
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error sending invite: $e");
+      }
+      rethrow;
+    }
+  }
+
 
 }

@@ -267,4 +267,21 @@ class ApiClient {
       throw Exception('Failed to load chat info');
     }
   }
+
+  Future<Response> newChat(String name) async {
+    if (kDebugMode) {
+      print("Creating new chat with name: $name");
+    }
+    return dio.post(
+      apipath_new_chat,
+      data: {
+        'name': name,
+      },
+      options: Options(
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        },
+      ),
+    );
+  }
 }

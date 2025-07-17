@@ -158,7 +158,7 @@ class LocalData{
   }
 
   static Future<DateTime?> getLastMessage(String uid) async{
-    final box = await Hive.openBox<DateTime>(kLastUpdateBox);
+    final box = await Hive.openBox<DateTime>(uid + kLastUpdateBox);
     DateTime? lastMessage = box.get(uid, defaultValue: null);
     if (kDebugMode) {
       print("Storage| Last message timestamp: $lastMessage");
@@ -168,7 +168,7 @@ class LocalData{
 
   static Future<void> setLastMessage(DateTime timestamp) async {
     final userId = await _getUserId();
-    final box = await Hive.openBox<DateTime>(kLastUpdateBox);
+    final box = await Hive.openBox<DateTime>(userId + kLastUpdateBox);
     await box.put(userId, timestamp);
     if (kDebugMode) {
       print("Storage| Last message timestamp updated: $timestamp");

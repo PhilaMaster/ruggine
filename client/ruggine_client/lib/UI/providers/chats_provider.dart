@@ -1,6 +1,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ruggine_client/UI/providers/invites_provider.dart';
 import 'package:ruggine_client/data/messages_repo.dart';
 import 'package:ruggine_client/models/chat.dart';
 import 'package:ruggine_client/models/message.dart';
@@ -13,7 +14,7 @@ final chatsRepositoryProvider = Provider<ChatsRepo>((ref) {
 
 final chatProvider = StateNotifierProvider<ChatsNotifier, List<Chat>?>((ref) {
   final repo = ref.read(chatsRepositoryProvider);
-  return (ChatsNotifier(repo));
+  return (ChatsNotifier(repo, ref));
 });
 
 
@@ -21,8 +22,9 @@ final chatProvider = StateNotifierProvider<ChatsNotifier, List<Chat>?>((ref) {
 //mantains order of chats
 class ChatsNotifier extends StateNotifier<List<Chat>?> {
   final ChatsRepo _repo;
+  Ref _ref;
 
-  ChatsNotifier(this._repo) : super(null) {}
+  ChatsNotifier(this._repo, this._ref) : super(null) {}
 
   List<Chat> sortChats(List<Chat> chats) {
     return chats..sort((a, b) => b.lastTime.compareTo(a.lastTime));
@@ -53,27 +55,9 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     }
   }
 
-  Future<void> loadNewChats(List<String> excludedIds) async {
-    try {
-      var newChats = await _repo.getNewChats();
-      if (newChats.isNotEmpty) {
-        newChats = newChats.where((chat) => !excludedIds.contains(chat.id)).toList();
-        await _repo.saveChats(newChats);
-        state = sortChats([...?state, ...newChats]);
-      } else {
-        if (kDebugMode) {
-          print("No new chats found.");
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error loading new chats: $e");
-      }
-    }
-  }
 
   Future<void> addChat(Chat chat) async {
-    await _repo.saveChats([chat]);
+    await _repo.saveChat(chat);
     if (state == null) {
       state = [chat];
     } else {
@@ -119,7 +103,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
           final updatedChat = state![index].copyWith(id: chatId, newMessages: state![index].newMessages + newMsgs);
           state![index] = updatedChat;
           state = sortChats([...?state]);
-          await _repo.saveChats([updatedChat]);
+          await _repo.saveChat(updatedChat);
         }
       }
     } catch (e) {
@@ -160,7 +144,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
         }
         state = sortChats(state!);
         final newindex = state!.indexWhere((chat) => chat.id == chatId);
-        await _repo.saveChats([state![newindex]]);
+        await _repo.saveChat(state![newindex]);
       }
     } catch (e) {
       if (kDebugMode) {
@@ -206,5 +190,49 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     if (kDebugMode) {
       print("Message added to chat $chatId: ${msg.content}");
     }
+  }
+
+  Future<List<String>> newChat(Chat newChat) async{
+    if (kDebugMode) {
+      print("Creating new chat: ${newChat.members}");
+    }
+    try {
+      final newchatresponse = await _repo.newChat(newChat);
+      if (state == null) {
+        state = [newchatresponse];
+      } else {
+        final updatedChats = [...state!, newchatresponse];
+        state = sortChats(updatedChats);
+      }
+      final List<String> okInvites = [];
+      for (String username in newChat.members){
+        if (kDebugMode) {
+          print("New chat member: $username");
+        }
+        if (username != newChat.created_by) {
+          //TODO sendInvite should operate over chatID not name, since we have it now
+          await _ref.watch(invitesProvider.notifier).sendInvite(
+            username,
+            newChat.name!,
+          ).then((_) {
+            if (kDebugMode) {
+              print("Invite sent to $username for chat ${newChat.name}");
+            }
+            okInvites.add(username);
+          }).catchError((_) {
+            if (kDebugMode) {
+              print("Error sending invite to $username for chat ${newChat.name}");
+            }
+          });
+        }
+      }
+      return okInvites;
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error adding new chat: $e");
+      }
+      return [];
+    }
+
   }
 }

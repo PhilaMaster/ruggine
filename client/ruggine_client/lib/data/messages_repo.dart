@@ -34,33 +34,25 @@ class ChatsRepo {
     }
   }
 
-  Future<void> saveChats(List<Chat> chats) async {
+  Future<Chat> newChat(Chat chat) async {
     try {
-      await LocalData.saveChats(chats);
+      final responseChat = await _apiClient.newChat(chat.name!);
+      Chat newChat = Chat.fromJson(responseChat.data);
+      newChat = newChat.copyWith(
+        created_by: chat.created_by,
+      );
+      if (kDebugMode) {
+        print("Repo_Chat| New chat created: ${newChat}");
+      }
+      await LocalData.saveChats([newChat]);
       if (kDebugMode) {
         print("Repo_Chat| All chats saved locally.");
       }
+      return newChat;
     } catch (e) {
       throw Exception('Error saving chats: $e');
     }
   }
-
-  // Future<List<Chat>> loadAllChats() async {
-  //   try {
-  //     final localChats = await getLocalChats();
-  //     if (kDebugMode) {
-  //       print("Loaded ${localChats.length} local chats.");
-  //     }
-  //     final newChats = await getNewChats();
-  //     if (kDebugMode) {
-  //       print("Loaded ${newChats.length} new chats from API.");
-  //     }
-  //     await saveChats(newChats);
-  //     return [...localChats, ...newChats];
-  //   } catch (e) {
-  //     throw Exception('Error loading all chats: $e');
-  //   }
-  // }
 
   Future<void> removeChat(String id) async {
     try {
@@ -105,6 +97,17 @@ class ChatsRepo {
       return chat;
     } catch (e) {
       throw Exception('Error fetching chat info: $e');
+    }
+  }
+
+  Future<void> saveChat(Chat chat) async {
+    try {
+      await LocalData.saveChat(chat);
+      if (kDebugMode) {
+        print("Chat saved: ${chat.id}");
+      }
+    } catch (e) {
+      throw Exception('Error saving chat: $e');
     }
   }
 }
