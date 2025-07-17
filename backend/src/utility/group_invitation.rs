@@ -26,6 +26,7 @@ pub(crate) mod group_invitation {
     #[derive(serde::Serialize)]
     pub struct GroupInvitationResponse {
         pub group_name: String,
+        pub group_id: i32, 
         pub sender_name: String
     }
 
@@ -56,7 +57,8 @@ pub(crate) mod group_invitation {
 
             responses.push(GroupInvitationResponse {
                 group_name,
-                sender_name
+                sender_name,
+                group_id: invitation.group_id
             });
         }
 

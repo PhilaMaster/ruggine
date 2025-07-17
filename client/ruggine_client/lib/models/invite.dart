@@ -14,16 +14,16 @@ class Invite {
   Map<String, dynamic> toJson() {
     return {
       'group_name': groupName,
-      'id': id,
+      'group_id': id,
       'sender_name': senderName,
     };
   }
 
   factory Invite.fromJson(Map<String, dynamic> json) {
     return Invite(
-      groupName: json['groupName'] ?? '',
-      id: json['id'] ?? '',
-      senderName: json['senderName'] ?? 'Unknown Sender',
+      groupName: json['group_name'] ?? '',
+      id: json['group_id'] ?? '',
+      senderName: json['sender_name'] ?? 'Unknown Sender',
     );
   }
 }
