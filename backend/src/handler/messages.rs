@@ -4,7 +4,7 @@ pub mod messages {
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::chats::chats::is_user_in_chat;
     use crate::utility::connection::establish_connection;
-    use crate::utility::group_chat::group_chat::{is_user_part_of_group, CreateGroupRequest};
+    // use crate::utility::chat::chat::{is_user_part_of_group, CreateGroupRequest};
     use crate::utility::messages::messages::{get_new_messages_since, send_message, GetNewMessagesQuery, SendMessageRequest};
 
     // ottiene i nuovi messaggi da una chat o gruppo

@@ -21,3 +21,4 @@ rand_core = { version = "0.6", features = ["getrandom"] }
 password-hash = "0.5"
 futures = "0.3.31"
 chrono = "0.4.41"
+sysinfo = "0.30"

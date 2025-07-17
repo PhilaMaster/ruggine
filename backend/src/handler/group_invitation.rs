@@ -1,9 +1,8 @@
 pub mod group_invitation {
     use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
     use crate::utility::authorization::authorization::Claims;
-    use crate::utility::chats::chats::{add_member_to_chat, is_user_in_chat};
+    use crate::utility::chats::chats::{accept_group_invitation, is_user_in_chat,get_group_by_name, get_group_chat_info_new_member};
     use crate::utility::connection::establish_connection;
-    use crate::utility::group_chat::group_chat::{get_group_by_name, get_group_chat_info_new_member};
     use crate::utility::group_invitation::group_invitation::{get_user_group_invitations, create_group_invitation, GroupInvitationRequest, GroupInvitationQuery, delete_group_invitation};
     use crate::utility::user::user::get_user_by_username;
 
@@ -96,7 +95,7 @@ pub mod group_invitation {
             let group_id: i32 = query.group_id.unwrap();
             let user_id: i32 = claims.user_id;
 
-            match add_member_to_chat(&mut conn, group_id, user_id) {
+            match accept_group_invitation(&mut conn, group_id, user_id) {
                 Ok(_) => {
                     delete_group_invitation(&mut conn, group_id, user_id).expect(" Errore durante l'eliminazione dell'invito");
                     Ok(HttpResponse::Accepted().json(serde_json::json!(
