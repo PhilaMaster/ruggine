@@ -108,7 +108,7 @@ class InvitesNotifier extends StateNotifier<List<Invite>?> {
       if (kDebugMode) {
         print("Error sending invite: $e");
       }
-      rethrow;
+      throw("Errore nell'invio dell'invito: nome gruppo o utente errato");
     }
   }
 
