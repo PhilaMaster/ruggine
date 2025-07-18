@@ -47,7 +47,7 @@ pub mod chats{
         }
     }
 
-    pub async fn create_group_handler(req: HttpRequest, group_data: web::Json<CreateGroupRequest>) -> actix_web::Result<HttpResponse> {
+    pub async fn create_group_handler(req: HttpRequest, group_data: web::Json<CreateGroupRequest>) ->Result<HttpResponse> {
         let mut conn = establish_connection();
         if let Some(claims) = req.extensions().get::<Claims>() {
             match create_group(&mut conn, claims.user_id, group_data.name.clone()) {

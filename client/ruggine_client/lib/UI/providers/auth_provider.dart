@@ -83,7 +83,9 @@ class AuthNotifier extends StateNotifier<User?> {
   // Pulisce risorse quando l'utente si disconnette
   Future<void> _cleanupUserSession() async {
     try {
-
+      ref.watch(chatProvider.notifier).cleanup();
+      ref.watch(msgProvider.notifier).cleanup();
+      ref.watch(invitesProvider.notifier).cleanup();
     } catch (e) {
       if (kDebugMode) {
         print('Errore durante la pulizia della sessione: $e');

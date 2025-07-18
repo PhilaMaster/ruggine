@@ -131,24 +131,6 @@ class MessagesRepo {
     }
   }
 
-  Future<List<Message>> getMessages(String chatId) async {
-    try {
-      final response = await _apiClient.getMessages(chatId);
-      final msgs = (response.data as List).map((msg) => Message.fromJson(msg)).toList();
-      msgs.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-      if (kDebugMode) {
-        print("Retrieved ${msgs} messages for chat $chatId from API.");
-      }
-      // Save messages to local storage
-      for (var msg in msgs) {
-        await LocalData.saveMessage(chatId, msg);
-      }
-      return msgs;
-    } catch (e) {
-      throw Exception('Error fetching messages: $e');
-    }
-  }
-
   Future<Message> sendMessage(String chatId, String content) async {
     try {
       final res = await _apiClient.sendMessage(chatId, content);

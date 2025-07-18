@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
@@ -41,9 +42,10 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     ref.read(msgProvider.notifier).sendMessage(
       widget.chat.id.toString(),
       _messageController.text.trim(),
-    );
-    _messageController.clear();
-    _scrollToBottom();
+    ).then((_) {
+      _messageController.clear();
+      _scrollToBottom();
+    });
   }
 
   void _scrollToBottom() {
@@ -212,9 +214,12 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   }
 
   String _formatTimestamp(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
+    final now = DateTime.now().toLocal();
+    final difference = now.difference(timestamp.toLocal());
 
+    if (kDebugMode){
+      print("Formatting timestamp: $timestamp, now: $now,  difference: $difference");
+    }
     if (difference.inDays > 0) {
       return '${difference.inDays}d ago';
     } else if (difference.inHours > 0) {

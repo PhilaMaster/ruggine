@@ -29,7 +29,7 @@ class Message {
     return {
       'id': id,
       'content': content,
-      'sent_at': timestamp.toIso8601String(),
+      'sent_at': timestamp.toUtc().toIso8601String(),
       'senderName': senderName,
       'chat_id': chatId,
     };
@@ -39,10 +39,16 @@ class Message {
     if (kDebugMode) {
       print("Creating Message from JSON: $json");
     }
+
+    // Parse timestamp from server (assume UTC) and convert to local time
+    DateTime parsedTimestamp;
+    String timestampStr = json['sent_at'];
+    parsedTimestamp = DateTime.parse(timestampStr).toLocal();
+
     return Message(
       id: json['id'].toString(),
       content: json['content'],
-      timestamp: DateTime.parse(json['sent_at']),
+      timestamp: parsedTimestamp,
       senderName: json['username'] ?? json['sender_id'].toString() ??
           'Unknown Sender',
       chatId: json['chat_id'].toString(),

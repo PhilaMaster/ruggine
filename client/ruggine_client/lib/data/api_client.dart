@@ -187,28 +187,7 @@ class ApiClient {
     }
   }
 
-  Future<Response> getMessages(String chatId) {
-    //for now return fake messages
-    return Future<Response<dynamic>>.value(
-      Response(
-        requestOptions: RequestOptions(path: 'path messages'),
-        data: [
-          {
-            'id': '1',
-            'senderName': 'Reba',
-            'content': 'Hello, how are you?',
-            'timestamp': DateTime.now().subtract(const Duration(minutes: 5)).toIso8601String(),
-          },
-          {
-            'id': '2',
-            'senderName': 'John',
-            'content': 'I am fine, thank you! How about you?',
-            'timestamp': DateTime.now().subtract(const Duration(minutes: 3)).toIso8601String(),
-          },
-        ],
-      ),
-    );
-  }
+
 
   Future<Response> sendMessage(String chatId, String content) {
     // Simulate sending a message
@@ -241,14 +220,16 @@ class ApiClient {
 
   Future<Response> getNewMessages(DateTime? lastUpdate) async {
     if (lastUpdate == null) {
-      return dio.get(
+      return await dio.get(
         apipath_new_messages
       );
     }
+    // Convert local timestamp to UTC before sending to server
+    final utcTimestamp = lastUpdate.toUtc();
     return dio.get(
       apipath_new_messages,
       queryParameters: {
-        'since': lastUpdate.toIso8601String(),
+        'since': utcTimestamp.toIso8601String(),
       },
     );
   }

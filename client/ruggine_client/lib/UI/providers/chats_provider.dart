@@ -235,4 +235,17 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
     }
 
   }
+
+   void cleanup() {
+    if (kDebugMode) {
+      print("Cleaning up chat state...");
+    }
+    try {
+      state = [];
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error during cleanup: $e");
+      }
+    }
+  }
 }

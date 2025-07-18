@@ -112,5 +112,12 @@ class InvitesNotifier extends StateNotifier<List<Invite>?> {
     }
   }
 
+  void cleanup() {
+    state = null; // Reset state to null
+    if (kDebugMode) {
+      print("InvitesNotifier cleaned up.");
+    }
+  }
+
 
 }

@@ -49,7 +49,22 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
   Future<void> loadNewMessages(String uid) async {
     final lastUpdate = await LocalData.getLastMessage(uid);
     final Map<String, List<Message>> newMessages = await _repo.retrieveNewMessages(lastUpdate);
-    LocalData.setLastMessage(DateTime.now());
+
+    // Save the timestamp of the latest message received (keep it as is from the message object)
+    if (newMessages.isNotEmpty) {
+      DateTime? latestMessageTime;
+      for (var chat in newMessages.entries) {
+        for (var message in chat.value) {
+          if (latestMessageTime == null || message.timestamp.isAfter(latestMessageTime)) {
+            latestMessageTime = message.timestamp;
+          }
+        }
+      }
+      if (latestMessageTime != null) {
+        LocalData.setLastMessage(latestMessageTime);
+      }
+    }
+
     if (newMessages.isEmpty) {
       if (kDebugMode) {
         print("No new message pending.");
@@ -166,6 +181,15 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
     await _chatNotifier.newMessage(chatId, message, _chatId == chatId);
     if (kDebugMode) {
       print("Message added to chat $chatId: ${message.content}");
+    }
+  }
+
+  void cleanup() {
+    // Cleanup resources if needed
+    _chatId = null;
+    state = null; // Reset state to null
+    if (kDebugMode) {
+      print("MessagesNotifier cleaned up.");
     }
   }
 
