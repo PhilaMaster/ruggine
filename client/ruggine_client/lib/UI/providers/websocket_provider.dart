@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ruggine_client/UI/providers/invites_provider.dart';
 import 'package:ruggine_client/core/storage.dart';
+import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../config.dart';
 import '../../models/invite.dart';
@@ -44,23 +46,11 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
   Timer? _reconnectTimer;
   Timer? _pingTimer;
   int _reconnectAttempts = 0;
-  static const int maxReconnectAttempts = 5;
+  static const int maxReconnectAttempts = 2;
   static const Duration reconnectDelay = Duration(seconds: 3);
   static const Duration pingInterval = Duration(seconds: 30);
 
-  WebSocketNotifier(this.ref) : super(WebSocketState(status: WebSocketStatus.disconnected)) {
-    // Ascolta i cambiamenti di autenticazione
-    ref.listen<User?>(authProvider, (previous, next) {
-      if (next != null && previous == null) {
-        // Utente si è loggato - reset del contatore per nuovo login
-        _reconnectAttempts = 0;
-        connect();
-      } else if (next == null && previous != null) {
-        // Utente si è disconnesso
-        disconnect();
-      }
-    });
-  }
+  WebSocketNotifier(this.ref) : super(WebSocketState(status: WebSocketStatus.disconnected)) {}
 
   Future<void> connect() async {
     final user = ref.read(authProvider);
@@ -80,8 +70,21 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       state = state.copyWith(status: WebSocketStatus.connecting);
       final token = await ref.read(authProvider.notifier).token;
       // Sostituisci con l'URL del tuo WebSocket
-      final wsUrl = Uri.parse('${AppConfig.webSocketUrl}/ws?token=$token');
-      _channel = WebSocketChannel.connect(wsUrl);
+      final uri = Uri(
+        scheme: 'ws',
+        host: Uri.parse(AppConfig.webSocketUrl).host,
+        port: Uri.parse(AppConfig.webSocketUrl).port,
+        path: '/ws',
+        queryParameters: {'token': token},
+        fragment: null,
+      );
+      if (kDebugMode) {
+        print('Connessione WebSocket a: $uri');
+      }
+      _channel = IOWebSocketChannel.connect(uri,
+          headers: {
+            'Authorization': 'Bearer $token',
+          });
 
       _subscription = _channel!.stream.listen(
         _onMessage,
@@ -93,8 +96,6 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
         status: WebSocketStatus.connected,
         errorMessage: null,
       );
-
-      // Non resettiamo qui _reconnectAttempts per permettere il conteggio corretto
       _startPingTimer();
 
     } catch (e) {
@@ -118,26 +119,29 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
   void _onMessage(dynamic data) {
     try {
       final message = jsonDecode(data);
-
-      // Gestisci diversi tipi di messaggi WebSocket
+      // Gestisci solo messaggi in arrivo
       switch (message['type']) {
         case 'new_message':
           _handleNewMessage(message);
           break;
-        case 'message_update':
-          _handleMessageUpdate(message);
-          break;
         case 'group_invite':
           _handleGroupInvite(message);
           break;
-        case 'pong':
-          // Risposta al ping
+        case 'ping':
+          // Rispondi al ping se necessario
+          if (kDebugMode) {
+            print('Ping ricevuto, nessuna azione necessaria');
+          }
           break;
         default:
-          print('Tipo di messaggio WebSocket sconosciuto: ${message['type']}');
+          if (kDebugMode) {
+            print('Tipo di messaggio WebSocket sconosciuto: ${message['type']}');
+          }
       }
     } catch (e) {
-      print('Errore nel parsing del messaggio WebSocket: $e');
+      if (kDebugMode) {
+        print('Errore nel parsing del messaggio WebSocket: $e');
+      }
     }
   }
 
@@ -147,13 +151,10 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       final chatId = data['chat_id'] as String?;
       ref.read(msgProvider.notifier).newMessage(chatId, message);
     } catch (e) {
-      print('Errore nel gestire nuovo messaggio: $e');
+      if (kDebugMode) {
+        print('Errore nel gestire nuovo messaggio: $e');
+      }
     }
-  }
-
-  void _handleMessageUpdate(Map<String, dynamic> data) {
-    // Gestisci aggiornamenti dei messaggi (es. messaggi letti)
-
   }
 
   void _handleGroupInvite(Map<String, dynamic> data) {
@@ -209,15 +210,14 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
     });
   }
 
-  void sendMessage(Map<String, dynamic> message) {
-    if (_channel != null && state.status == WebSocketStatus.connected) {
-      _channel!.sink.add(jsonEncode(message));
-    }
-  }
-
   @override
   void dispose() {
     disconnect();
     super.dispose();
   }
+
+  // Stato della connessione
+  bool get isConnected => state.status == WebSocketStatus.connected;
+  bool get isConnecting => state.status == WebSocketStatus.connecting;
+  bool get hasError => state.status == WebSocketStatus.error;
 }

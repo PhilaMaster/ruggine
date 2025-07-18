@@ -105,6 +105,7 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
 
   Future<void> sendMessage(String chatId, String content) async {
     try {
+      // Invia solo tramite HTTP API
       final mex = await _repo.sendMessage(chatId, content);
       await _chatNotifier.updateLastMessage(chatId, mex);
       if (state == null) {

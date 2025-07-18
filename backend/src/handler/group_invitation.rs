@@ -109,6 +109,7 @@ pub mod group_invitation {
                     delete_group_invitation(&mut conn, group_id, user_id).expect(" Errore durante l'eliminazione dell'invito");
                     Ok(HttpResponse::Accepted().json(serde_json::json!(
                         get_group_chat_info_new_member(& mut conn, group_id).unwrap()
+                        //{"id": group_id,}
                     )))
                 },
                 Err(diesel::NotFound) => {

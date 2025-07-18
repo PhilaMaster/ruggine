@@ -44,11 +44,11 @@ use crate::middleware::authentication_middleware::AuthMiddleware;
 use crate::handler::group_invitation::group_invitation::{accept_group_invitation_handler, create_group_invitation_handler, delete_group_invitation_handler, get_user_group_invitations_handler};
 // use crate::handler::group_message::group_message::{get_all_group_messages_handler, send_group_message_handler};
 use crate::handler::websocket;
-use crate::handler::websocket::WebSocketHandler;
+use crate::handler::websocket::{ws_index, WebSocketHandler};
 use crate::handler::messages::messages::{get_new_messages_since_handler, send_message_handler};
 use crate::utility::log_manager::log_manager::log_cpu_usage;
 
-type ClientSockets = Arc<Mutex<HashMap<String, Vec<Addr<WebSocketHandler>>>>>;
+type ClientSockets = Arc<Mutex<HashMap<String, Addr<WebSocketHandler>>>>;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -72,7 +72,7 @@ async fn main() -> std::io::Result<()> {
                     .service(
                         web::scope("")
                             .wrap(AuthMiddleware)
-                            .route("/ws", web::get().to(websocket::ws_index))
+                            .route("/ws", web::get().to(ws_index))
                             .route("/users", web::get().to(get_users_handler))
                             .route("/testToken", web::get().to(test_handler))
                             .route("/chat", web::post().to(create_private_chat_handler))

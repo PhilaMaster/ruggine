@@ -74,6 +74,8 @@ class AuthNotifier extends StateNotifier<User?> {
       }
       // Recupera gli inviti pending
       ref.read(invitesProvider.notifier).loadInvites(uid);
+      // Inizializza WebSocket con il token
+      ref.read(webSocketProvider.notifier).connect();
     } catch (e) {
       // Gestisci errori di inizializzazione
       print('Errore durante l\'inizializzazione della sessione: $e');
@@ -86,6 +88,7 @@ class AuthNotifier extends StateNotifier<User?> {
       ref.watch(chatProvider.notifier).cleanup();
       ref.watch(msgProvider.notifier).cleanup();
       ref.watch(invitesProvider.notifier).cleanup();
+      ref.watch(webSocketProvider.notifier).disconnect();
     } catch (e) {
       if (kDebugMode) {
         print('Errore durante la pulizia della sessione: $e');
