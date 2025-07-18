@@ -17,7 +17,7 @@ pub mod chats{
         pub last_time: String,
         pub new_messages: i32,
         pub name: String,           // group name
-        pub created_by: String,     // creator of the group non fattibile, sempre = "".to_string()
+        pub created_by: String,
         pub members: Vec<String>,
         pub is_group: bool,
         pub created_at: String,
