@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ruggine_client/UI/pages/chat_page.dart';
 import 'package:ruggine_client/core/const.dart';
+import 'package:ruggine_client/config.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'UI/pages/home_page.dart';
@@ -58,6 +59,11 @@ final routerProvider = Provider<GoRouter>((ref) {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Test di connettività per diagnosticare problemi di rete
+  if (kDebugMode) {
+    await AppConfig.testConnectivity();
+  }
 
   // Configure window constraints for desktop platforms
   if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows ||

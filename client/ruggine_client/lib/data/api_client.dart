@@ -15,15 +15,23 @@ class ApiClient {
   ApiClient([Ref? ref]){
     dio = Dio(BaseOptions(
       baseUrl: apibase,
-      connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 3),
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      sendTimeout: const Duration(seconds: 30),
     ));
 
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final token = await SecureStorage.readToken();
         if (kDebugMode) {
-          print('Requesting: ${options.method} ${options.path}');
+          print('=== HTTP REQUEST ===');
+          print('Method: ${options.method}');
+          print('Path: ${options.path}');
+          print('Base URL: ${options.baseUrl}');
+          print('Full URL: ${options.uri}');
+          print('Headers: ${options.headers}');
+          print('Data: ${options.data}');
+          print('===================');
         }
         if (token != null) {
           if (kDebugMode) {
@@ -32,6 +40,29 @@ class ApiClient {
           options.headers['Authorization'] = 'Bearer $token';
         }
         return handler.next(options);
+      },
+      onResponse: (response, handler) {
+        if (kDebugMode) {
+          print('=== HTTP RESPONSE ===');
+          print('Status Code: ${response.statusCode}');
+          print('Status Message: ${response.statusMessage}');
+          print('Headers: ${response.headers}');
+          print('Data: ${response.data}');
+          print('====================');
+        }
+        return handler.next(response);
+      },
+      onError: (error, handler) {
+        if (kDebugMode) {
+          print('=== HTTP ERROR ===');
+          print('Error Message: ${error.message}');
+          print('Error Type: ${error.type}');
+          print('Status Code: ${error.response?.statusCode}');
+          print('Response Data: ${error.response?.data}');
+          print('Request URL: ${error.requestOptions.uri}');
+          print('==================');
+        }
+        return handler.next(error);
       },
     ));
     // Aggiungi l'interceptor per gestire 401/403

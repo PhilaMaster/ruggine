@@ -34,6 +34,7 @@ use std::sync::{Arc, Mutex};
 use actix::prelude::*;
 use actix_web::{web, App, HttpServer, Result, HttpResponse, middleware::Logger, HttpRequest};
 use actix_web::web::Data;
+use actix_cors::Cors;
 use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
 use crate::handler::authorization::authorization::{login_handler, test_handler};
@@ -61,10 +62,17 @@ async fn main() -> std::io::Result<()> {
 
     println!("Server running on http://localhost:8080");
 
-    HttpServer::new(move || {
+    let router = HttpServer::new(move || {
         App::new()
             .app_data(Data::new(client_sockets.clone()))
             .wrap(Logger::default())
+            .wrap(
+                Cors::default()
+                    .allow_any_origin()
+                    .allow_any_method()
+                    .allow_any_header()
+                    .supports_credentials()
+            )
             .service(
                 web::scope("")
                     .route("/auth/register", web::post().to(create_user_handler))
@@ -86,8 +94,12 @@ async fn main() -> std::io::Result<()> {
                             .route("/sendMessage", web::post().to(send_message_handler))
                     )
             )
-    })
-    .bind("127.0.0.1:8080")?
-    .run()
-    .await
+    });
+
+    router
+        .bind("0.0.0.0:8080")?
+        .run()
+        .await
+
+
 }
