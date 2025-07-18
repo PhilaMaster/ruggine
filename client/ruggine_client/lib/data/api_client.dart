@@ -239,16 +239,6 @@ class ApiClient {
     );
   }
 
-  Future<void> initSocket(String token) async {
-    if (kDebugMode) {
-      print("Initializing WebSocket with token: $token");
-    }
-    webSocket = WebSocketChannel.connect(
-        Uri.parse(websocketUrl),
-        );
-    await webSocket.ready;
-  }
-
   Future<Response> getNewMessages(DateTime? lastUpdate) async {
     if (lastUpdate == null) {
       return await dio.get(
