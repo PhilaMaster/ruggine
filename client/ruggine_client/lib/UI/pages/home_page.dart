@@ -270,7 +270,15 @@ class HomePage extends ConsumerWidget {
                                   // Main ListTile content
                                   ListTile(
                                     contentPadding: EdgeInsets.fromLTRB(16, 8, 60, 8), // Extra right padding for counter
-                                    title: Text("Chat #${chat.id}"),
+                                    // se la chat è di gruppo, mostra il nome del gruppo, altrimenti il nome del destinatario
+                                    title: Text(
+                                      chat.is_group
+                                          ? chat.name.toString()
+                                          : "Chat con ${chat.members.firstWhere(
+                                            (member) => member != Hive.box('auth').get('username', defaultValue: 'Unknown'),
+                                        orElse: () => 'Unknown',
+                                      )}",
+                                    ),
                                     subtitle: ConstrainedBox(
                                       constraints: BoxConstraints(
                                         minHeight: 20, // Minimum height for subtitle
