@@ -28,9 +28,18 @@ pub mod group_invitation {
 
         // richiede login, quindi serve ottenere i claims
         if let Some(claims) = req.extensions().get::<Claims>() {
-            let chat_id = get_group_by_name(&mut conn, invitation_data.group_name.clone()).expect("Group by name not found").id;
-            let receiver_id = get_user_by_username(&mut conn, &invitation_data.receiver_name.clone()).expect("User by username not found").id;;
+            let chat_id_result = get_group_by_name(&mut conn, invitation_data.group_name.clone());
+            let receiver_id_result = get_user_by_username(&mut conn, &invitation_data.receiver_name.clone());
 
+            if chat_id_result.is_err() {
+                return Ok(HttpResponse::NotFound().body("Gruppo non trovato"));
+            }
+            if receiver_id_result.is_err() {
+                return Ok(HttpResponse::NotFound().body("Utente non trovato"));
+            }
+
+            let chat_id = chat_id_result.unwrap().id;
+            let receiver_id = receiver_id_result.unwrap().id;
 
             if !is_user_in_chat(&mut conn, claims.user_id, chat_id) {
                 return Ok(HttpResponse::Forbidden().body("L'utente non è parte del gruppo"));
