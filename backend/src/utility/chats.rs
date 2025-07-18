@@ -135,7 +135,7 @@ pub mod chats{
 
         // come su whatsapp, l'utente non vede i messaggi scritti prima che entrasse nel gruppo
         // quindi last time = now
-        let last_time = chrono::Utc::now().to_rfc3339();
+        let last_time = chrono::Utc::now().to_string();
         let creator_username = u::users
             .filter(u::id.eq(chat.created_by))
             .select(u::username)
