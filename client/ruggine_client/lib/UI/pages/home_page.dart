@@ -10,6 +10,7 @@ import '../../models/invite.dart';
 import '../../models/message.dart';
 import '../providers/chats_provider.dart';
 import '../providers/messages_provider.dart';
+import '../widgets/invite_user_dialog.dart';
 
 
 
@@ -81,8 +82,8 @@ class HomePage extends ConsumerWidget {
                   child: isWide?
                   ElevatedButton.icon(
                     icon: Icon(Icons.group_add),
-                    label: Text("ricevi falso messaggio su gruppo 1"),
-                    onPressed: () => handleNewMessage(context, ref),
+                    label: Text("Invita utente in un gruppo"),
+                    onPressed: () => handleCreateInvite(context, ref),
                   ):null,
                 ),
                 SizedBox(height: 12),
@@ -381,6 +382,13 @@ class HomePage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => const CreateChatDialog(),
+    );
+  }
+
+  void handleCreateInvite(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => const InviteUserDialog(),
     );
   }
 
