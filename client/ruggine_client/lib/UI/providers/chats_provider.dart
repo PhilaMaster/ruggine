@@ -7,6 +7,7 @@ import 'package:ruggine_client/models/chat.dart';
 import 'package:ruggine_client/models/message.dart';
 
 import '../../data/api_client.dart';
+import '../../exceptions/exceptions.dart';
 
 final chatsRepositoryProvider = Provider<ChatsRepo>((ref) {
   return ChatsRepo(ApiClient());
@@ -208,7 +209,16 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
       if (kDebugMode) {
         print("Error adding new chat: $e");
       }
-      return [];
+      String errorMessage;
+      final errorString = e.toString().toLowerCase();
+
+      if (errorString.contains('status code of 500')) {
+        throw ChatCreationError('Errore del server durante la creazione della chat');
+      } else if (errorString.contains('status code of 404') || errorString.contains('utente non trovato')) {
+        throw UserNotFoundException();
+      } else {
+        throw ChatCreationError(e.toString());
+      }
     }
 
   }

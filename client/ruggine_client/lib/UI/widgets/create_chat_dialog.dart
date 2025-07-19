@@ -5,6 +5,8 @@ import 'package:ruggine_client/UI/providers/chats_provider.dart';
 import 'package:ruggine_client/UI/providers/message_service.dart';
 import 'package:ruggine_client/models/chat.dart';
 
+import '../../exceptions/exceptions.dart';
+
 class CreateChatDialog extends ConsumerStatefulWidget {
   const CreateChatDialog({super.key});
 
@@ -64,26 +66,35 @@ class _CreateChatDialogState extends ConsumerState<CreateChatDialog> {
         is_group: _isGroup ,
         created_at: DateTime.now(),
       );
-      await ref.read(chatProvider.notifier).newChat(newChat).then(
-              (okInvites) {
-            //show what invites were sent
-            if (okInvites.isNotEmpty) {
-              MessageService.show(
-                'Chat creata e inviti inviati con successo: ${okInvites.join(', ')}',
-              );
-            }else{
-              if (_isGroup) {
+      try{
+        await ref.read(chatProvider.notifier).newChat(newChat).then(
+                (okInvites) {
+              //show what invites were sent
+              if (okInvites.isNotEmpty) {
                 MessageService.show(
-                  'Chat di gruppo creata con successo senza inviti, invita partecipanti in seguito.',
+                  'Chat creata e inviti inviati con successo: ${okInvites.join(', ')}',
                 );
-              } else {
-                MessageService.show(
-                  'Chat privata creata con successo.',
-                );
+              }else{
+                if (_isGroup) {
+                  MessageService.show(
+                    'Chat di gruppo creata con successo senza inviti, invita partecipanti in seguito.',
+                  );
+                } else {
+                  MessageService.show(
+                    'Chat privata creata con successo.',
+                  );
+                }
               }
             }
-          }
-      );
+        );
+      }catch(e){
+        if (e is SameUserException || e is UserNotFoundException || e is ChatCreationError) {
+          MessageService.show(e.toString());
+        } else {
+          MessageService.show('Errore imprevisto: ${e.toString()}');
+        }
+      }
+
       Navigator.of(context).pop();
       // Show success message
     }
