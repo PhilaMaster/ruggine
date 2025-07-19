@@ -158,7 +158,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
 
   void _handleNewMessage(Map<String, dynamic> data) {
     try {
-      final message = Message.fromJson(data['message']);
+      final message = Message.fromJson(data['content']);
       final chatId = message.chatId;
       ref.read(msgProvider.notifier).newMessage(chatId, message);
     } catch (e) {
@@ -170,11 +170,13 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
 
   void _handleGroupInvite(Map<String, dynamic> data) {
     // Gestisci nuovi inviti ai gruppi
-    if (data['invite'] == null) {
-      print('Invito non valido: ${data['invite']}');
+    if (data['content'] == null) {
+      if (kDebugMode) {
+        print('Invito non valido: ${data['content']}');
+      }
       return;
     }
-    final invite = Invite.fromJson(data['invite']);
+    final invite = Invite.fromJson(data['content']);
     ref.read(invitesProvider.notifier).receiveInvite(invite);
   }
 

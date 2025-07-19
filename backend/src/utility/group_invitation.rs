@@ -70,7 +70,7 @@ pub(crate) mod group_invitation {
         group_id: i32,
         sender_id: i32,
         receiver_id: i32,
-    ) -> QueryResult<()> {
+    ) -> QueryResult<GroupInvitationResponse> {
         let new_invitation = NewGroupInvitation {
             group_id,
             sender_id,
@@ -80,8 +80,21 @@ pub(crate) mod group_invitation {
         diesel::insert_into(group_invitation::table)
             .values(&new_invitation)
             .execute(conn)?;
-
-        Ok(())
+        //retrieve groupinvitation response
+        let group_name = chats::table
+            .find(group_id)
+            .select(chats::name)
+            .first::<Option<String>>(conn)?
+            .unwrap_or_default();
+        let sender_name = users::table
+            .find(sender_id)
+            .select(users::username)
+            .first::<String>(conn)?;
+        Ok(GroupInvitationResponse {
+            group_name,
+            sender_name,
+            group_id: group_id.to_string(),
+        })
     }
 
     pub fn delete_group_invitation(
