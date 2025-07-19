@@ -1,5 +1,6 @@
 pub mod group_invitation {
     use actix_web::{web, HttpMessage, HttpRequest, HttpResponse};
+    use crate::handler::websocket::SocketMessage;
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::chats::chats::{accept_group_invitation, is_user_in_chat,get_group_by_name, get_group_chat_info_new_member};
     use crate::utility::connection::establish_connection;
@@ -23,7 +24,11 @@ pub mod group_invitation {
         }
     }
 
-    pub async fn create_group_invitation_handler(req: HttpRequest, invitation_data: web::Json<GroupInvitationRequest>) -> actix_web::Result<HttpResponse> {
+    pub async fn create_group_invitation_handler(
+        req: HttpRequest,
+        invitation_data: web::Json<GroupInvitationRequest>,
+        client_sockets: web::Data<crate::ClientSockets>,
+    ) -> actix_web::Result<HttpResponse> {
         let mut conn = establish_connection();
 
         // richiede login, quindi serve ottenere i claims
@@ -48,7 +53,15 @@ pub mod group_invitation {
                 return Ok(HttpResponse::BadRequest().body("Il destinatario è già membro del gruppo"));
             }
             match create_group_invitation(&mut conn, chat_id, claims.user_id, receiver_id) {
-                Ok(_) => {
+                Ok(invitation) => {
+                    let user_sockets = client_sockets.get_ref().lock().unwrap();
+                    // Invia un messaggio al WebSocket del destinatario dell'invito
+                    if let Some(socket) = user_sockets.get(&receiver_id) {
+                        socket.do_send(SocketMessage{
+                            tipe: "group_invite".to_string(),
+                            json_message: serde_json::to_string(&invitation)?,
+                        });
+                    }
                     Ok(HttpResponse::Created().finish())
                 },
                 // se esiste già un invito per questo gruppo, restituisce un errore 400
