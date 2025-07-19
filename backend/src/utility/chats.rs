@@ -208,7 +208,6 @@ pub mod chats{
             .values(NewChatMember {
                 chat_id: chat.id,
                 user_id,
-                joined_at: chrono::Utc::now().to_rfc3339(),
             })
             .execute(conn)?;
 
@@ -247,6 +246,5 @@ pub mod chats{
     pub struct NewChatMember {
         pub chat_id: i32,
         pub user_id: i32,
-        pub joined_at: String,
     }
 }
