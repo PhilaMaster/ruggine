@@ -74,6 +74,7 @@ class Chat {
     DateTime? lastTime,
     int? newMessages,
     String? created_by,
+    List<String>? members,
   }) {
     return Chat(
       id: id ?? this.id,
@@ -83,7 +84,7 @@ class Chat {
       newMessages: newMessages ?? this.newMessages,
       name: name,
       created_by: created_by ?? this.created_by,
-      members: List<String>.from(members),
+      members: members ?? this.members,
       // Copy members list
       is_group: is_group ?? false,
       created_at: created_at,

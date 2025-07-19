@@ -275,10 +275,14 @@ class HomePage extends ConsumerWidget {
                                     title: Text(
                                       chat.is_group
                                           ? chat.name.toString()
-                                          : "Chat con ${chat.members.firstWhere(
-                                            (member) => member != ref.watch(authProvider)?.username,
-                                        orElse: () => 'Unknown',
-                                      )}",
+                                          : "Chat con ${
+                                            !chat.members.isEmpty
+                                                ? (chat.members[0] == (ref.read(authProvider)?.username ?? "")
+                                                  ? chat.members[1]
+                                                  : chat.members[0])
+                                                : "Unknown"
+
+                                      }",
                                     ),
                                     subtitle: ConstrainedBox(
                                       constraints: BoxConstraints(

@@ -41,9 +41,10 @@ class ChatsRepo {
         // il nome dell'uttente che crea la chat è sempre il primo,
         // quindi il second membro è l'altro utente
         : await _apiClient.newPrivateChat(chat.members[1]);
-      Chat newChat = Chat.fromJson(responseChat.data);
-      newChat = newChat.copyWith(
-        created_by: chat.created_by,
+        Chat newChat = Chat.fromJson(responseChat.data);
+        newChat = newChat.copyWith(
+          created_by: chat.created_by,
+          members: chat.members,
       );
       if (kDebugMode) {
         print("Repo_Chat| New chat created: ${newChat}");
@@ -130,7 +131,7 @@ class ChatsRepo {
     try {
       await LocalData.saveChat(chat);
       if (kDebugMode) {
-        print("Chat saved: ${chat.id}");
+        print("Chat saved locally: ${chat.toString()}");
       }
     } catch (e) {
       throw Exception('Error saving chat: $e');
