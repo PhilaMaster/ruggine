@@ -36,7 +36,11 @@ class ChatsRepo {
 
   Future<Chat> newChat(Chat chat) async {
     try {
-      final responseChat = await _apiClient.newChat(chat.name!);
+      final responseChat = chat.is_group
+        ? await _apiClient.newChat(chat.name!)
+        // il nome dell'uttente che crea la chat è sempre il primo,
+        // quindi il second membro è l'altro utente
+        : await _apiClient.newPrivateChat(chat.members[1]);
       Chat newChat = Chat.fromJson(responseChat.data);
       newChat = newChat.copyWith(
         created_by: chat.created_by,
@@ -50,7 +54,7 @@ class ChatsRepo {
       }
       return newChat;
     } catch (e) {
-      throw Exception('Error saving chats: $e');
+      throw Exception('Error saving chats in message_repo: $e, ${e.runtimeType}, ${chat.toString()}');
     }
   }
 

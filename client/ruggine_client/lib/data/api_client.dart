@@ -269,6 +269,23 @@ class ApiClient {
     }
   }
 
+  Future<Response> newPrivateChat(String receiverName) async {
+    if (kDebugMode) {
+      print("Creating new private chat with: $receiverName");
+    }
+    return dio.post(
+      apipath_new_private_chat,
+      data: {
+        'receiver_name': receiverName,
+      },
+      options: Options(
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+        },
+      ),
+    );
+  }
+
   Future<Response> newChat(String name) async {
     if (kDebugMode) {
       print("Creating new chat with name: $name");

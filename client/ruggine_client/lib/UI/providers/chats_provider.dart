@@ -169,48 +169,41 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
 
   Future<List<String>> newChat(Chat newChat) async{
     if (kDebugMode) {
-      print("Creating new chat: ${newChat.members}");
+      print("Creating new chat: ${newChat.toString()}");
     }
     try {
-      Chat newchatresponse;
-      if (newChat.is_group) {
-        newchatresponse = await _repo.newChat(newChat);
-      } else {
-        newchatresponse = await _repo.newPrivateChat(newChat);
-      }
-      // print("sosoosososos");
+      final newchatresponse = await _repo.newChat(newChat);
       if (state == null) {
         state = [newchatresponse];
       } else {
         final updatedChats = [...state!, newchatresponse];
         state = sortChats(updatedChats);
       }
-
-      if (newChat.is_group){
-        final List<String> okInvites = [];
-        for (String username in newChat.members){
-          if (kDebugMode) {
-            print("New chat member: $username");
-          }
-          if (username != newChat.created_by) {
-            await _ref.watch(invitesProvider.notifier).sendInvite(
-              username,
-              newChat.name!,
-            ).then((_) {
-              if (kDebugMode) {
-                print("Invite sent to $username for chat ${newChat.name}");
-              }
-              okInvites.add(username);
-            }).catchError((_) {
-              if (kDebugMode) {
-                print("Error sending invite to $username for chat ${newChat.name}");
-              }
-            });
-          }
-        }
+      final List<String> okInvites = [];
+      if (! newChat.is_group){
         return okInvites;
       }
-      return [];
+      for (String username in newChat.members){
+        if (kDebugMode) {
+          print("New chat member: $username");
+        }
+        if (username != newChat.created_by) {
+          await _ref.watch(invitesProvider.notifier).sendInvite(
+            username,
+            newChat.name!,
+          ).then((_) {
+            if (kDebugMode) {
+              print("Invite sent to $username for chat ${newChat.name}");
+            }
+            okInvites.add(username);
+          }).catchError((_) {
+            if (kDebugMode) {
+              print("Error sending invite to $username for chat ${newChat.name}");
+            }
+          });
+        }
+      }
+      return okInvites;
     } catch (e) {
       if (kDebugMode) {
         print("Error adding new chat: $e");

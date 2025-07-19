@@ -5,6 +5,7 @@ pub mod chats{
     use crate::utility::chats::chats::{create_group, create_private_chat, get_chat_by_id, get_chat_members_by_chat_id, is_user_in_chat, ChatMemberInfo, CreateChatRequest, CreateGroupRequest};
     use crate::models::{Chat, User};
     use crate::utility::authorization::authorization::Claims;
+    use crate::utility::user::user::get_user_by_username;
 
     #[derive(Deserialize)]
     pub struct ChatInfoQuery {
@@ -65,8 +66,17 @@ pub mod chats{
 
     pub async fn create_private_chat_handler(req: HttpRequest, group_data: web::Json<CreateChatRequest>) -> actix_web::Result<HttpResponse> {
         let mut conn = establish_connection();
+
+        // ottien l'id dell'utente
+        let user_id_result = get_user_by_username(&mut conn, &group_data.receiver_name);
+        // se l'utente non esiste, ritorna un errore (Ok(errore))
+        let user_id = match user_id_result {
+            Ok(user) => user.id,
+            Err(_) => return Ok(HttpResponse::NotFound().json("utente non trovato")),
+        };
+
         if let Some(claims) = req.extensions().get::<Claims>() {
-            match create_private_chat(&mut conn, claims.user_id, group_data.user_id) {
+            match create_private_chat(&mut conn, claims.user_id, user_id) {
                 Ok(group) => {
                     Ok(HttpResponse::Created().json(group))
                 },

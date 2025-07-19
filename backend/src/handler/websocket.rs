@@ -55,7 +55,7 @@ impl Handler<SocketMessage> for WebSocketHandler {
 
     fn handle(&mut self, msg: SocketMessage, ctx: &mut Self::Context) -> Self::Result {
         println!("Sending message to WebSocket: {}", msg.json_message);
-        ctx.text(format!("{{ \"type\": \"{}\", \"message\": {} }}", msg.tipe, msg.json_message));
+        ctx.text(format!("{{ \"type\": \"{}\", \"content\": {} }}", msg.tipe, msg.json_message));
     }
 }
 
