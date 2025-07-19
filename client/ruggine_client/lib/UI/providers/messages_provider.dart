@@ -26,11 +26,15 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
   final ChatsNotifier _chatNotifier;
   final AuthNotifier _authNotifier;
   String? _chatId;
+  bool _isInsideChat = false;
 
   MessagesNotifier(this._repo, this._chatNotifier, this._authNotifier)
       : super(null);
 
   int get length => state?.length ?? 0;
+  void setInsideChat(bool val) {
+    _isInsideChat = val;
+  }
 
   Message? getMessage(int index) {
     if (state == null || index < 0 || index >= state!.length) {
@@ -93,7 +97,7 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
       }
       if (messages.isNotEmpty) {
         await _chatNotifier.updateLastMessage(chatId, messages.last,
-            unreadCount: currentChat ? 0 : messages.length);
+            newUnread: currentChat ? 0 : messages.length);
       }
 
     }catch (e) {
@@ -171,6 +175,7 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
         return;
       }
     }
+    //if current chat, update visible message list
     if (_chatId == chatId) {
       if (state == null) {
         state = [message];
@@ -179,7 +184,7 @@ class MessagesNotifier extends StateNotifier<List<Message>?> {
       }
     }
     await _repo.saveMessage(chatId, message);
-    await _chatNotifier.newMessage(chatId, message, _chatId == chatId);
+    await _chatNotifier.newMessage(chatId, message, _chatId == chatId && _isInsideChat);
     if (kDebugMode) {
       print("Message added to chat $chatId: ${message.content}");
     }

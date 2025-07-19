@@ -114,7 +114,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
   }
   
   Future<void> updateLastMessage(String chatId, Message? msg,
-      {int unreadCount = 0}) async {
+      {int newUnread = 0}) async {
     try {
       if (state != null) {
         final index = state!.indexWhere((chat) => chat.id == chatId);
@@ -130,7 +130,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
               lastSender: msg.senderName,
               lastMessage: msg.content,
               lastTime: msg.timestamp,
-              newMessages: unreadCount,
+              newMessages: state![index].newMessages + newUnread,
             );
           }
         } else {
@@ -139,10 +139,10 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
             lastSender: msg?.senderName ?? '',
             lastMessage: msg?.content ?? '',
             lastTime: msg?.timestamp ?? DateTime.now(),
-            newMessages: unreadCount,
+            newMessages: (msg != null) ? 1 : 0,
           ));
         }
-        state = sortChats(state!);
+        state = sortChats([...state!]);
         final newindex = state!.indexWhere((chat) => chat.id == chatId);
         await _repo.saveChat(state![newindex]);
       }
@@ -161,32 +161,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
         return;
       }
     }
-    await updateLastMessage(chatId!, msg);
-    if (state != null) {
-      final index = state!.indexWhere((chat) => chat.id == chatId);
-      if (index != -1) {
-        state![index] = state![index].copyWith(newMessages: state![index].newMessages + (isChatOpened ? 0 : 1));
-      } else {
-        // If chat not found, create a new one
-        final chatinfo = await _repo.getChatInfo(chatId);
-        state!.add(chatinfo.copyWith(
-          lastSender: msg.senderName,
-          lastMessage: msg.content,
-          lastTime: msg.timestamp,
-          newMessages: isChatOpened ? 0 : 1,
-        ));
-      }
-      state = sortChats(state!);
-    } else {
-      final chatinfo = await _repo.getChatInfo(chatId);
-      state = [chatinfo.copyWith(
-        lastSender: msg.senderName,
-        lastMessage: msg.content,
-        lastTime: msg.timestamp,
-        newMessages: isChatOpened ? 0 : 1,
-      )
-      ];
-    }
+    await updateLastMessage(chatId!, msg, newUnread: isChatOpened ? 0 : 1);
     if (kDebugMode) {
       print("Message added to chat $chatId: ${msg.content}");
     }

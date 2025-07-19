@@ -8,6 +8,7 @@ pub mod chats{
     use serde::Deserialize;
     use diesel::prelude::*;
     use diesel::result::Error;
+    use diesel::sql_types::Integer;
 
     #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
     pub struct ChatInfo {
@@ -70,6 +71,17 @@ pub mod chats{
         res.is_ok()
     }
 
+    pub fn get_id_members_of_chat(conn: &mut SqliteConnection, chat_id: i32) -> QueryResult<Vec<(i32,String)>> {
+        use crate::schema::chat_members::dsl as cm;
+        use crate::schema::users::dsl as u;
+
+        cm::chat_members
+            .inner_join(u::users.on(u::id.eq(cm::user_id)))
+            .filter(cm::chat_id.eq(chat_id))
+            .select((u::id, u::username))
+            .load::<(i32, String)>(conn)
+    }
+
 
     #[derive(serde::Deserialize, Clone, Debug, Insertable)]
     #[diesel(table_name = chat_members)]
@@ -81,8 +93,6 @@ pub mod chats{
     // aggiungi un membro a una chat
     pub fn accept_group_invitation(conn: &mut SqliteConnection, chat_id: i32, user_id: i32) -> QueryResult<()> {
         use crate::schema::group_invitation::dsl as gi;
-
-
         // controlla che effettivamente l'utentesia stato invitato a questa chat
         let invitation_exists = gi::group_invitation
             .filter(gi::group_id.eq(chat_id))

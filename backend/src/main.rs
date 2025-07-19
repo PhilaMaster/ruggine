@@ -49,7 +49,7 @@ use crate::handler::websocket::{ws_index, WebSocketHandler};
 use crate::handler::messages::messages::{get_new_messages_since_handler, send_message_handler};
 use crate::utility::log_manager::log_manager::log_cpu_usage;
 
-type ClientSockets = Arc<Mutex<HashMap<String, Addr<WebSocketHandler>>>>;
+type ClientSockets = Arc<Mutex<HashMap<i32, Addr<WebSocketHandler>>>>;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
