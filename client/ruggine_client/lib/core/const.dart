@@ -11,6 +11,7 @@ const String apipath_new_messages = "chatMessages";
 const String apipath_send_msg = "sendMessage";
 const String apipath_chat_info = "chatInfo";
 const String apipath_new_chat = "groups";
+const String apipath_new_private_chat = "chat";
 
   // inviti
 const String apipath_invites = "groupInvites";

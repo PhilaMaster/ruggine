@@ -54,6 +54,28 @@ class ChatsRepo {
     }
   }
 
+  // Future<Chat> newPrivateChat(Chat chat) async {
+  //   try {
+  //     // print("MEMBERS: "+chat.members[0]+" "+chat.members[1]);
+  //     final responseChat = await _apiClient.newPrivateChat(int.parse(chat.members[1]));//todo change to user name
+  //     Chat newChat = Chat.fromJson(responseChat.data);
+  //     // print(newChat);
+  //     newChat = newChat.copyWith(
+  //       created_by: chat.created_by,
+  //     );
+  //     if (kDebugMode) {
+  //       print("Repo_Chat| New chat created: ${newChat}");
+  //     }
+  //     await LocalData.saveChats([newChat]);
+  //     if (kDebugMode) {
+  //       print("Repo_Chat| All chats saved locally.");
+  //     }
+  //     return newChat;
+  //   } catch (e) {
+  //     throw Exception('Error saving chats: $e');
+  //   }
+  // }
+
   Future<void> removeChat(String id) async {
     try {
       LocalData.deleteChat(id);

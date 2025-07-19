@@ -72,9 +72,15 @@ class _CreateChatDialogState extends ConsumerState<CreateChatDialog> {
                 'Chat creata e inviti inviati con successo: ${okInvites.join(', ')}',
               );
             }else{
-              MessageService.show(
-                'Chat creata con successo senza inviti, invita partecipanti in seguito.',
-              );
+              if (_isGroup) {
+                MessageService.show(
+                  'Chat di gruppo creata con successo senza inviti, invita partecipanti in seguito.',
+                );
+              } else {
+                MessageService.show(
+                  'Chat privata creata con successo.',
+                );
+              }
             }
           }
       );
@@ -233,9 +239,9 @@ class _CreateChatDialogState extends ConsumerState<CreateChatDialog> {
                       if (value == null || value.trim().isEmpty) {
                         return 'L\'username è obbligatorio';
                       }
-                      if (value.trim().length < 3) {
-                        return 'L\'username deve essere di almeno 3 caratteri';
-                      }
+                      // if (value.trim().length < 3) {
+                      //   return 'L\'username deve essere di almeno 3 caratteri';
+                      // }
                       return null;
                     },
                   ),

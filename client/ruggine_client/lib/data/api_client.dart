@@ -249,7 +249,7 @@ class ApiClient {
     return dio.get(
       apipath_new_messages,
       queryParameters: {
-        'since': lastUpdate.toIso8601String(),
+        'since': '${lastUpdate.toUtc().toIso8601String().split('.').first}Z',
       },
     );
   }
@@ -285,4 +285,20 @@ class ApiClient {
       ),
     );
   }
+  // Future<Response> newPrivateChat(int user_id) async {
+  //   if (kDebugMode) {
+  //     print("Creating new chat with user: $user_id");
+  //   }
+  //   return dio.post(
+  //     apipath_new_private_chat,
+  //     data: {
+  //       'user_id': user_id,//todo change to user name
+  //     },
+  //     options: Options(
+  //       headers: {
+  //         HttpHeaders.contentTypeHeader: 'application/json',
+  //       },
+  //     ),
+  //   );
+  // }
 }
