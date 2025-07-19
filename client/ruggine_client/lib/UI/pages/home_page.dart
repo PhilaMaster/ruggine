@@ -8,6 +8,7 @@ import 'package:ruggine_client/UI/widgets/create_chat_dialog.dart';
 import '../../models/chat.dart';
 import '../../models/invite.dart';
 import '../../models/message.dart';
+import '../providers/auth_provider.dart';
 import '../providers/chats_provider.dart';
 import '../providers/messages_provider.dart';
 import '../widgets/invite_user_dialog.dart';
@@ -275,7 +276,7 @@ class HomePage extends ConsumerWidget {
                                       chat.is_group
                                           ? chat.name.toString()
                                           : "Chat con ${chat.members.firstWhere(
-                                            (member) => member != Hive.box('auth').get('username', defaultValue: 'Unknown'),
+                                            (member) => member != ref.watch(authProvider)?.username,
                                         orElse: () => 'Unknown',
                                       )}",
                                     ),

@@ -210,7 +210,6 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
           print("New chat member: $username");
         }
         if (username != newChat.created_by) {
-          //TODO sendInvite should operate over chatID not name, since we have it now
           await _ref.watch(invitesProvider.notifier).sendInvite(
             username,
             newChat.name!,

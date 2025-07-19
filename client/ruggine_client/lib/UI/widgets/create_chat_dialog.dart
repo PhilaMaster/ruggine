@@ -60,7 +60,7 @@ class _CreateChatDialogState extends ConsumerState<CreateChatDialog> {
         created_by: curUser!.username,
         members: _isGroup
             ? [curUser.username, ..._participants]
-            : [..._participants],
+            : [curUser.username, _usernameController.text.trim()],
         is_group: _isGroup,
         created_at: DateTime.now(),
       );
