@@ -59,7 +59,7 @@ class LocalData{
     final box = await Hive.openBox<Chat>(userId + kChatsBox);
     await box.put(chat.id, chat);
     if (kDebugMode) {
-      print("Storage| Chat salvata: ${chat.id}");
+      print("Storage| Chat salvata: ${chat.id}, ${chat.is_group}");
     }
   }
 

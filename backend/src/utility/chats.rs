@@ -231,7 +231,7 @@ pub mod chats{
 
     #[derive(Deserialize, Clone, Debug)]
     pub(crate) struct CreateChatRequest {
-        pub(crate) user_id: i32,
+        pub(crate) receiver_name: String,
     }
 
     #[derive(Insertable)]

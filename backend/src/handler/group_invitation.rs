@@ -69,7 +69,7 @@ pub mod group_invitation {
         let mut conn = establish_connection();
         // richiede login, quindi serve ottenere i claims
         if let Some(claims) = req.extensions().get::<Claims>() {
-            if(query.group_id.is_none()) {
+            if query.group_id.is_none() {
                 return Ok(HttpResponse::BadRequest().body("L'ID del gruppo è richiesto"));
             }
 

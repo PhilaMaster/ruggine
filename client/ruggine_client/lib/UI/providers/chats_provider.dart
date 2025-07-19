@@ -169,7 +169,7 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
 
   Future<List<String>> newChat(Chat newChat) async{
     if (kDebugMode) {
-      print("Creating new chat: ${newChat.members}");
+      print("Creating new chat: ${newChat.toString()}");
     }
     try {
       final newchatresponse = await _repo.newChat(newChat);
@@ -180,6 +180,9 @@ class ChatsNotifier extends StateNotifier<List<Chat>?> {
         state = sortChats(updatedChats);
       }
       final List<String> okInvites = [];
+      if (! newChat.is_group){
+        return okInvites;
+      }
       for (String username in newChat.members){
         if (kDebugMode) {
           print("New chat member: $username");

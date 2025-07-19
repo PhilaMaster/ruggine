@@ -53,7 +53,7 @@ class _CreateChatDialogState extends ConsumerState<CreateChatDialog> {
         id: '-1',
         // Placeholder ID, will be set by the server
         lastSender: "",
-        lastMessage: null,
+        lastMessage: "",
         lastTime: DateTime.now(),
         newMessages: 0,
         name: _isGroup ? _groupNameController.text.trim() : null,
@@ -61,7 +61,7 @@ class _CreateChatDialogState extends ConsumerState<CreateChatDialog> {
         members: _isGroup
             ? [curUser.username, ..._participants]
             : [curUser.username, _usernameController.text.trim()],
-        is_group: _isGroup,
+        is_group: _isGroup ,
         created_at: DateTime.now(),
       );
       await ref.read(chatProvider.notifier).newChat(newChat).then(
