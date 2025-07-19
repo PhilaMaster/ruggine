@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:ruggine_client/UI/pages/chat_page.dart';
+import 'package:ruggine_client/UI/providers/chats_provider.dart';
 import 'package:ruggine_client/core/const.dart';
 import 'package:ruggine_client/config.dart';
 import 'package:window_manager/window_manager.dart';
@@ -13,6 +14,7 @@ import 'UI/pages/login_page.dart';
 import 'UI/pages/settings.dart';
 import 'UI/providers/auth_provider.dart';
 import 'UI/providers/message_service.dart';
+import 'UI/providers/messages_provider.dart';
 import 'UI/providers/theme_provider.dart';
 import 'UI/providers/websocket_provider.dart';
 import 'models/chat.dart';
@@ -37,7 +39,10 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(path: '/', builder: (_, __) => HomePage()),
-      GoRoute(path: route_home, builder: (_, __) => HomePage()),
+      GoRoute(path: route_home, builder: (_, __) {
+        ref.read(msgProvider.notifier).setInsideChat(false);
+        return HomePage();
+      }),
       GoRoute(path: route_login, builder: (_, __) => LoginPage()),
       GoRoute(path: '/settings', builder: (_, __) => const SettingsPage()),
       GoRoute(path: '/chat/:chatId', builder: (context, state) {
@@ -45,6 +50,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         if (chatId == null) {
           return const Center(child: Text('Chat ID is missing'));
         }
+        ref.read(msgProvider.notifier).setInsideChat(true);
         final chat = state.extra as Chat?;
         if (chat == null) {
           return const Center(

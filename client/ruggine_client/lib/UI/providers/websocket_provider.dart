@@ -48,27 +48,20 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
   int _reconnectAttempts = 0;
   static const int maxReconnectAttempts = 2;
   static const Duration reconnectDelay = Duration(seconds: 3);
-  static const Duration pingInterval = Duration(seconds: 30);
+  static const Duration pingInterval = Duration(seconds: 60);
 
   WebSocketNotifier(this.ref) : super(WebSocketState(status: WebSocketStatus.disconnected)) {}
 
-  Future<void> connect() async {
-    final user = ref.read(authProvider);
-    if (user == null) {
-      state = state.copyWith(
-        status: WebSocketStatus.error,
-        errorMessage: 'Utente non autenticato',
-      );
-      return;
-    }
-
+  Future<void> connect(String uid) async {
     if (_channel != null) {
       await disconnect();
     }
 
     try {
       state = state.copyWith(status: WebSocketStatus.connecting);
-      final token = await ref.read(authProvider.notifier).token;
+      final token = await ref
+          .read(authProvider.notifier)
+          .token;
       // Sostituisci con l'URL del tuo WebSocket
       final uri = Uri(
         scheme: 'ws',
@@ -119,6 +112,14 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
   void _onMessage(dynamic data) {
     try {
       final message = jsonDecode(data);
+      // Log per debugging
+      if (kDebugMode) {
+        print('Messaggio WebSocket ricevuto: ${message.toString()}');
+      }
+
+      // Reset del contatore di riconnessione in caso di messaggio ricevuto con successo
+      _reconnectAttempts = 0;
+
       // Gestisci solo messaggi in arrivo
       switch (message['type']) {
         case 'new_message':
@@ -128,9 +129,18 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
           _handleGroupInvite(message);
           break;
         case 'ping':
-          // Rispondi al ping se necessario
+          // Rispondi al ping dal server con un pong
+          if (_channel != null && state.status == WebSocketStatus.connected) {
+            _channel!.sink.add(jsonEncode({'type': 'pong'}));
+          }
           if (kDebugMode) {
-            print('Ping ricevuto, nessuna azione necessaria');
+            print('Ping ricevuto, pong inviato');
+          }
+          break;
+        case 'pong':
+          // Server ha risposto al nostro ping
+          if (kDebugMode) {
+            print('Pong ricevuto dal server');
           }
           break;
         default:
@@ -141,6 +151,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
     } catch (e) {
       if (kDebugMode) {
         print('Errore nel parsing del messaggio WebSocket: $e');
+        print('Dati ricevuti: $data');
       }
     }
   }
@@ -148,7 +159,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
   void _handleNewMessage(Map<String, dynamic> data) {
     try {
       final message = Message.fromJson(data['message']);
-      final chatId = data['chat_id'] as String?;
+      final chatId = message.chatId;
       ref.read(msgProvider.notifier).newMessage(chatId, message);
     } catch (e) {
       if (kDebugMode) {
@@ -188,7 +199,7 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
       _reconnectAttempts++;
       _reconnectTimer = Timer(reconnectDelay, () {
         if (ref.read(authProvider) != null) {
-          connect();
+          connect(ref.read(authProvider.notifier).currentUserId!);
         }
       });
     }
@@ -221,3 +232,4 @@ class WebSocketNotifier extends StateNotifier<WebSocketState> {
   bool get isConnecting => state.status == WebSocketStatus.connecting;
   bool get hasError => state.status == WebSocketStatus.error;
 }
+

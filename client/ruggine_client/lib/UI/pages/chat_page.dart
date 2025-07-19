@@ -216,10 +216,6 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   String _formatTimestamp(DateTime timestamp) {
     final now = DateTime.now().toLocal();
     final difference = now.difference(timestamp.toLocal());
-
-    if (kDebugMode){
-      print("Formatting timestamp: $timestamp, now: $now,  difference: $difference");
-    }
     if (difference.inDays > 0) {
       return '${difference.inDays}d ago';
     } else if (difference.inHours > 0) {

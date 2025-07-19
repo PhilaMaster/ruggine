@@ -71,15 +71,15 @@ pub mod chats{
         res.is_ok()
     }
 
-    pub fn get_id_members_of_chat(conn: &mut SqliteConnection, chat_id: i32) -> QueryResult<Vec<i32>> {
+    pub fn get_id_members_of_chat(conn: &mut SqliteConnection, chat_id: i32) -> QueryResult<Vec<(i32,String)>> {
         use crate::schema::chat_members::dsl as cm;
         use crate::schema::users::dsl as u;
 
         cm::chat_members
             .inner_join(u::users.on(u::id.eq(cm::user_id)))
             .filter(cm::chat_id.eq(chat_id))
-            .select(u::id)
-            .load::<i32>(conn)
+            .select((u::id, u::username))
+            .load::<(i32, String)>(conn)
     }
 
 

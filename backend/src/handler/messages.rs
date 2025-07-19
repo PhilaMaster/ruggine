@@ -3,7 +3,7 @@ use crate::handler::websocket::SocketMessage;
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::chats::chats::{get_id_members_of_chat, is_user_in_chat};
     use crate::utility::connection::establish_connection;
-    use crate::utility::messages::messages::{get_new_messages_since, send_message, GetNewMessagesQuery, SendMessageRequest};
+    use crate::utility::messages::messages::{get_new_messages_since, send_message, GetNewMessagesQuery, MessageWithSender, SendMessageRequest};
     use crate::ClientSockets;
     use actix_web::{web, HttpMessage, HttpRequest};
     use diesel::QueryResult;
@@ -52,17 +52,29 @@ use crate::handler::websocket::SocketMessage;
 
             match send_message(&mut conn, message_data.chat_id, claims.user_id, message_data.content.clone()) {
                 Ok(messages) => {
+                    let mex_sendername = MessageWithSender {
+                        id: messages.id,
+                        chat_id: messages.chat_id,
+                        sender_id: messages.sender_id,
+                        content: messages.content.clone(),
+                        sent_at: messages.sent_at.to_string(),
+                        username: claims.username.clone(),
+                    };
                     match get_id_members_of_chat(&mut conn, message_data.chat_id){
                         Ok(members) => {
                             // Notifica tutti gli utenti nella chat
                             let user_sockets = client_sockets.get_ref().lock().unwrap();
                             for member in members {
-                                if let Some(socket) = user_sockets.get(&member) {
+                                if member.0 == claims.user_id {
+                                    continue;
+                                }
+                                if let Some(socket) = user_sockets.get(&member.0) {
                                     socket.do_send(SocketMessage{
-                                        json_message: serde_json::to_string(&messages)?,
+                                        tipe: "new_message".to_string(),
+                                        json_message: serde_json::to_string(&mex_sendername)?,
                                     });
                                 }
-                                println!("Notifying user {} about new message in chat {}", member, message_data.chat_id);
+                                println!("Notifying user {} about new message in chat {}", member.1, message_data.chat_id);
                             }
                         }
                         Err(_) => return Ok(actix_web::HttpResponse::InternalServerError().json(serde_json::json!({

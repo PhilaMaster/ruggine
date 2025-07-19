@@ -246,11 +246,10 @@ class ApiClient {
       );
     }
     // Convert local timestamp to UTC before sending to server
-    final utcTimestamp = lastUpdate.toUtc();
     return dio.get(
       apipath_new_messages,
       queryParameters: {
-        'since': utcTimestamp.toIso8601String(),
+        'since': lastUpdate.toIso8601String(),
       },
     );
   }
