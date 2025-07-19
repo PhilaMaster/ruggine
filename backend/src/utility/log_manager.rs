@@ -11,7 +11,7 @@ pub mod log_manager{
         let pid = std::process::id();
         let mut sys = System::new_all();
         //check if the logs directory exists, create it if not 
-        if let Err(e) = fs::create_dir_all("../../logs") {
+        if let Err(e) = fs::create_dir_all("logs") {
             eprintln!("Errore nella creazione della cartella logs: {}", e);
             return;
         }
