@@ -72,8 +72,8 @@ class HomePage extends ConsumerWidget {
                   width: double.infinity,
                   child: isWide?
                   ElevatedButton.icon(
-                    icon: Icon(Icons.group_add),
-                    label: Text("Crea gruppo"),
+                    icon: Icon(Icons.add_comment),
+                    label: Text("Crea chat"),
                     onPressed: () => handleCreateGroup(context, ref),
                   ):null,
                 ),
@@ -381,13 +381,30 @@ class HomePage extends ConsumerWidget {
           ),
         ),
       ),
+
+      // pulsanti per schermo piccolo
       floatingActionButton: isWide
           ? null
-          : FloatingActionButton(
-        onPressed: () => handleCreateGroup(context, ref),
-        tooltip: 'Crea gruppo',
-        child: Icon(Icons.group_add),
+          : Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                onPressed: () => handleCreateGroup(context, ref),
+                tooltip: 'Crea chat',
+                child: Icon(Icons.add_comment),
+
+              ),
+              SizedBox(width: 16),
+              FloatingActionButton(
+                onPressed: () => handleCreateInvite(context, ref),
+                tooltip: 'Invita utente',
+                child: Icon(Icons.group_add),
+
+              ),
+            ],
       ),
+
+
     );
   }
 
