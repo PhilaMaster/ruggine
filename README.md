@@ -131,7 +131,7 @@ Protocolli utilizzati
 - Caching: Memorizzazione locale messaggi e chat
 - Background sync: Sincronizzazione in background
 
-###Safety
+### Safety
 #### Backend Safety (Rust)
 Utilizzando Rust come linguaggio di programmazione per il nostro server abbiamo come garanzie:
 - Memory safety garantita: previene buffer overflow, memory leaks e data races a compile-time
