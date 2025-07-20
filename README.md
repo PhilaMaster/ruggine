@@ -146,7 +146,7 @@ Utilizzando Rust come linguaggio di programmazione per il nostro server abbiamo 
 - Exception handling strutturato: Try-catch blocks per gestione controllata degli errori
 - Input validation: Controlli sui dati utente prima dell'elaborazione
 - Safe navigation: Operatori ?. e ?? per accesso sicuro ai dati
-Data Safety
+#### Data Safety
 - Salvataggio automatico locale: Persistenza dei dati nel database locale
 - Validazione payload: Controllo dei dati in ingresso e uscita
 - Cleanup automatico: Pulizia dello stato dell'applicazione (cleanup() method)
