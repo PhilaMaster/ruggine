@@ -1,14 +1,14 @@
 pub mod chats{
-    use diesel::dsl::now;
-    use crate::schema::{chats, chat_members, users};
-    use crate::models::{Chat, ChatMember, Message, User};
+    
+    use crate::schema::{chats, chat_members};
+    use crate::models::{Chat, ChatMember};
     use diesel::prelude::*;
-    use crate::utility::user::user::get_user_by_username;
+    
     use diesel::{ExpressionMethods, Insertable, QueryDsl, QueryResult, RunQueryDsl, SqliteConnection};
     use serde::Deserialize;
-    use diesel::prelude::*;
+    
     use diesel::result::Error;
-    use diesel::sql_types::Integer;
+    
 
     #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
     pub struct ChatInfo {
@@ -165,19 +165,6 @@ pub mod chats{
             is_group: chat.is_group,
             created_at: chat.created_at,
         })
-    }
-
-    pub fn is_user_part_of_group(conn: &mut SqliteConnection, user_id: i32, group_id: i32) -> QueryResult<()>{
-
-        use self::chat_members::dsl as cm;
-
-        cm::chat_members.filter(cm::user_id.eq(user_id))
-            .filter(cm::user_id.eq(user_id))
-            .filter(cm::chat_id.eq(group_id))
-            .first::<ChatMember>(conn)?;
-
-        Ok(())
-
     }
 
     pub fn create_group(conn: &mut SqliteConnection, user_id: i32, name: String) -> QueryResult<Chat> {

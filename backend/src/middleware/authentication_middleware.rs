@@ -7,7 +7,6 @@ use actix_web::{
 use futures::future::{ok, Ready, LocalBoxFuture};
 use std::task::{Context, Poll};
 use std::rc::Rc;
-use std::pin::Pin;
 use jsonwebtoken::{decode, DecodingKey, Validation};
 use crate::utility::authorization::authorization::Claims;
 

@@ -3,7 +3,7 @@ pub mod chats{
     use crate::utility::connection::establish_connection;
     use serde::Deserialize;
     use crate::utility::chats::chats::{create_group, create_private_chat, get_chat_by_id, get_chat_members_by_chat_id, is_user_in_chat, ChatMemberInfo, CreateChatRequest, CreateGroupRequest};
-    use crate::models::{Chat, User};
+    use crate::models::Chat;
     use crate::utility::authorization::authorization::Claims;
     use crate::utility::user::user::get_user_by_username;
 

@@ -34,7 +34,7 @@ impl Actor for WebSocketHandler{
         }
     }
 
-    fn stopped(&mut self, ctx: &mut Self::Context) {
+    fn stopped(&mut self, _ctx: &mut Self::Context) {
         println!("WebSocket connection closed");
         if let Some(user_id) = &self.user_id {
             let mut map = self.client_sockets.lock().unwrap();

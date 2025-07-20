@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive/hive.dart';
 import 'package:ruggine_client/UI/providers/invites_provider.dart';
 import 'package:ruggine_client/UI/widgets/ruggine_appbar.dart';
 import 'package:ruggine_client/UI/widgets/create_chat_dialog.dart';
-import '../../models/chat.dart';
-import '../../models/invite.dart';
-import '../../models/message.dart';
 import '../providers/auth_provider.dart';
 import '../providers/chats_provider.dart';
-import '../providers/messages_provider.dart';
 import '../widgets/invite_user_dialog.dart';
 
 

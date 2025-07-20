@@ -1,6 +1,5 @@
 
 import 'package:flutter/foundation.dart';
-import 'package:ruggine_client/UI/providers/auth_provider.dart';
 
 import '../core/storage.dart';
 import '../models/chat.dart';

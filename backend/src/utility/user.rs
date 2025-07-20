@@ -30,13 +30,6 @@ pub mod user{
         pub(crate) password: String,
     }
 
-    impl UserRequest {
-        pub fn new(username: String, password: String) -> Self {
-            UserRequest { username, password }
-        }
-
-    }
-
     #[derive(Serialize)]
     pub(crate) struct UserResponse {
         id: i32,

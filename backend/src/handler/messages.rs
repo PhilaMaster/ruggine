@@ -6,7 +6,7 @@ use crate::handler::websocket::SocketMessage;
     use crate::utility::messages::messages::{get_new_messages_since, send_message, GetNewMessagesQuery, MessageWithSender, SendMessageRequest};
     use crate::ClientSockets;
     use actix_web::{web, HttpMessage, HttpRequest};
-    use diesel::QueryResult;
+    
 
     // ottiene i nuovi messaggi da una chat o gruppo
     pub async fn get_new_messages_since_handler(req: HttpRequest, query: web::Query<GetNewMessagesQuery>) -> actix_web::Result<actix_web::HttpResponse> {

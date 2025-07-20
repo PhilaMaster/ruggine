@@ -1,11 +1,10 @@
-use serde::Deserialize;
 
 pub mod messages {
     use diesel::{QueryResult, SqliteConnection, ExpressionMethods, QueryDsl, RunQueryDsl, Insertable, Queryable, JoinOnDsl};
     use serde::{Deserialize, Serialize};
     use crate::utility::chats::chats::get_chat_ids_of_user;
-    use crate::schema::{messages, users};
-    use crate::models::{Message, User};
+    use crate::schema::messages;
+    use crate::models::Message;
     
     #[derive(Queryable, Serialize)]
     pub struct MessageWithSender {

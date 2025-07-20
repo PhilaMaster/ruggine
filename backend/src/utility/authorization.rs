@@ -2,7 +2,6 @@ pub mod authorization{
     use diesel::prelude::*;
     use crate::models::{User};
     use crate::schema::users;
-    use actix_web::{HttpResponse};
     use serde::{Deserialize, Serialize};
     use crate::utility::user::user::{verify_password };
 
@@ -19,13 +18,6 @@ pub mod authorization{
             Claims { user_id, username, exp }
         }
 
-        pub fn return_valid_response(&self, message: String) ->  HttpResponse {
-            HttpResponse::Ok().json(serde_json::json!({
-                        "message": message,
-                        "user_id": self.user_id,
-                        "username": self.username,
-                    }))
-        }
     }
 
     pub fn authenticate_user(conn: &mut SqliteConnection, username: &str, password: &str) -> QueryResult<User> {
