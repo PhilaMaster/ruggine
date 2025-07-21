@@ -18,13 +18,7 @@ Ruggine è un'applicazione di chat multipiattaforma composta da un backend in Ru
     ```bash
    cargo build
    ```
-3. Configura il database:
-Esegui le migrazioni:
-     ```bash
-     diesel setup
-     diesel migration run
-     ```
-4. Avvia il server:
+3. Avvia il server:
     ```bash
    cargo run
    ```
