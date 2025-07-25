@@ -1,154 +1,180 @@
-﻿# Manuale utente
-## Descrizione del progetto
-Ruggine è un'applicazione di chat multipiattaforma composta da un backend in Rust e un client Flutter. L'applicazione supporta messaggi privati, chat di gruppo e inviti.
-## Requisiti di sistema
-- Backend: Rust (versione 1.70+), Diesel CLI
-- Client: Flutter SDK (versione 3.0+), Dart SDK
+# Ruggine Chat Application
+
+## Project Description
+Ruggine is a multiplatform chat application consisting of a Rust backend and a Flutter client. The application supports private messages, group chats, and invitations.
+
+## System Requirements
+- Backend: Rust (version 1.70+), Diesel CLI
+- Client: Flutter SDK (version 3.0+), Dart SDK
 - Database: SQLite
-- Sistema operativo: Windows, macOS, Linux, Android, iOS (testato solo su Windows e *...*)
+- Operating Systems: Windows, macOS, Linux, Android, iOS (tested on Windows and Linux)
 
-## Installazione
+## Installation
 
-### Backend
-1. Naviga nella cartella del progetto:
+### Backend Setup
+1. Navigate to the project directory:
    ```bash
    cd backend
-    ```
-2. Installa le dipendenze:
-    ```bash
+   ```
+2. Install dependencies:
+   ```bash
    cargo build
    ```
-3. Avvia il server:
-    ```bash
+3. Start the server:
+   ```bash
    cargo run
    ```
 
-### Client
-
-1. Naviga nella cartella del client:
+### Client Setup
+1. Navigate to the client directory:
    ```bash
    cd client/ruggine_client
    ```
-2. Installa le dipendenze:
+2. Install dependencies:
    ```bash
-    flutter pub get
-    ```
-3. Avvia l'applicazione:
+   flutter pub get
+   ```
+3. Run the application:
    ```bash
    flutter run
    ```
 
-## Utilizzo dell'applicazione
-è possibile utilizzare le seguenti funzionalità:
-### Registrazione e login
-- Registrare un nuovo account o effettuare il login
-- L'autenticazione viene gestita tramite token JWT
-### Messaggi privati
-- Creare una chat con un utente tramite il suo username
-- Digitare il messaggio e premere invio
-- I messaggi vengono sincronizzati in tempo reale
-### Chat di gruppo
-- Creare un nuovo gruppo o unirsi a uno esistente
-- Inviare messaggi al gruppo
-- Gestire i membri del gruppo
-### Inviti di gruppo
-- Inviare inviti ad altri utenti
-- Accettare o rifiutare gli inviti ricevuti
+## Application Usage
+
+The following features are available:
+
+### Registration and Login
+- Register a new account or log in to an existing one
+- Authentication is handled via JWT tokens
+
+### Private Messages
+- Create a chat with a user using their username
+- Type your message and press enter
+- Messages are synchronized in real-time
+
+### Group Chats
+- Create a new group or join an existing one
+- Send messages to the group
+- Manage group members
+
+### Group Invitations
+- Send invitations to other users
+- Accept or decline received invitations
 
 ## API Reference
-Per sviluppatori: consultare il file ```API_GUIDE.md``` e la collection Postman ```Ruggine Chat API.postman_collection.json``` per testare le API.
+For developers: consult the `API_GUIDE.md` file and the Postman collection `Ruggine Chat API.postman_collection.json` to test the APIs.
 
-# Manuale del progettista
-## Architettura generale del sistema
-Il progetto ruggine implementa un sistema di chat multipiattaforma basato su un'architettura client-server. Il backend è sviluppato in Rust per garantire performance elevate e sicurezza della memoria, mentre il client utilizza Flutter per la portabilità multipiattaforma.
-## Backend - Architettura del server
-### Struttura modulare
-Il server è organizzato in moduli specializzati:
+---
 
+# Architecture Documentation
 
-- Handler: Gestisce le richieste HTTP e WebSocket
-- Models: Definisce le strutture dati del dominio
-- Middleware: Implementa autenticazione e validazione
-- Utility: Funzioni di supporto per logging e configurazione
+## System Overview
+The Ruggine project implements a multiplatform chat system based on a client-server architecture. The backend is developed in Rust to ensure high performance and memory safety, while the client uses Flutter for multiplatform portability.
 
-### Gestione della concorrenza
-Il server utilizza il framework Actix Web che implementa un modello di concorrenza basato su:
+## Backend Architecture
 
+### Modular Structure
+The server is organized into specialized modules:
 
-- Actor system: Ogni connessione è gestita da un attore indipendente
-- Async/await: Programmazione asincrona per I/O non bloccanti
-- Thread pool: Pool di thread per elaborazioni CPU-intensive
+- **Handler**: Manages HTTP and WebSocket requests
+- **Models**: Defines domain data structures
+- **Middleware**: Implements authentication and validation
+- **Utility**: Support functions for logging and configuration
 
-### Strutture dati principali
-- User: Gestione utenti con autenticazione JWT
-- Message: Messaggi punto-punto con timestamp, valido sia per chat private che di gruppo
-- Chat: Identifica una chat (sia private che di gruppo) e ne mantiene le informazioni principali
-- GroupInvite: Sistema di inviti con stati (pending, accepted, rejected)
+### Concurrency Management
+The server uses the Actix Web framework which implements a concurrency model based on:
 
-### Persistenza dati
-Utilizza SQLite con Diesel ORM per:
-- Migrazione automatica dello schema
-- Query type-safe compilate
-- Connection pooling per ottimizzare le performance
+- **Actor system**: Each connection is managed by an independent actor
+- **Async/await**: Asynchronous programming for non-blocking I/O
+- **Thread pool**: Thread pool for CPU-intensive processing
 
-## Client - Architettura Flutter
-### Organizzazione del codice
-- Core: Logica di business e servizi
-- Data: Layer di accesso ai dati e API
-- Models: Rappresentazione dei dati lato client
-- UI: Interface utente reattiva
-- Exceptions: Gestione centralizzata degli errori
+### Main Data Structures
+- **User**: User management with JWT authentication
+- **Message**: Point-to-point messages with timestamps, valid for both private and group chats
+- **Chat**: Identifies a chat (both private and group) and maintains its main information
+- **GroupInvite**: Invitation system with states (pending, accepted, rejected)
 
-### Gestione dello stato
-Implementa pattern BLoC (Business Logic Component) per:
-- Separazione tra logica di business e UI
-- Gestione reattiva degli eventi
-- Testing semplificato dei componenti
+### Data Persistence
+Uses SQLite with Diesel ORM for:
+- Automatic schema migration
+- Compile-time type-safe queries
+- Connection pooling to optimize performance
 
-### Comunicazione client-server
-Protocolli utilizzati
-- HTTP/HTTPS: API REST per operazioni CRUD
-- WebSocket: Comunicazione bidirezionale real-time, per notifica i client in seguito a ricezione di messaggi e inviti
-- JSON: Formato di scambio dati standardizzato
-### Autenticazione e sicurezza
-- JWT tokens: Autenticazione stateless con refresh token
-- CORS: Controllo accessi cross-origin configurabile
-- Input validation: Sanitizzazione dati in ingresso sia client che server
+## Client Architecture (Flutter)
 
-### Scalabilità e performance
-#### Ottimizzazioni server
-- Connection pooling: Riutilizzo connessioni database
-- Lazy loading: Caricamento dati su richiesta
-- Batch operations: Elaborazione in lotti per efficiency
-#### Ottimizzazioni client
-- Pagination: Caricamento incrementale messaggi
-- Caching: Memorizzazione locale messaggi e chat
-- Background sync: Sincronizzazione in background
+### Code Organization
+- **Core**: Business logic and services
+- **Data**: Data access layer and APIs
+- **Models**: Client-side data representation
+- **UI**: Reactive user interface
+- **Exceptions**: Centralized error handling
 
-### Safety
-#### Backend Safety (Rust)
-Utilizzando Rust come linguaggio di programmazione per il nostro server abbiamo come garanzie:
-- Memory safety garantita: previene buffer overflow, memory leaks e data races a compile-time
-- Ownership system: Gestione automatica della memoria senza garbage collection
-- Error handling con Result<T,E>: Gestione esplicita degli errori senza eccezioni impreviste
-- Pattern matching esaustivo: Controllo completo di tutti i casi possibili
-- Lifetime management: Prevenzione di dangling pointers e use-after-free
-#### Frontend Safety (Flutter/Dart)
-- Null safety: Prevenzione di null pointer exceptions a compile-time
-- State immutabilità: Utilizzo di Riverpod con stato immutabile per prevenire modifiche accidentali
-- Type safety: Sistema di tipi forte per prevenire errori di tipo
-- Exception handling strutturato: Try-catch blocks per gestione controllata degli errori
-- Input validation: Controlli sui dati utente prima dell'elaborazione
-- Safe navigation: Operatori ?. e ?? per accesso sicuro ai dati
-#### Data Safety
-- Salvataggio automatico locale: Persistenza dei dati nel database locale
-- Validazione payload: Controllo dei dati in ingresso e uscita
-- Cleanup automatico: Pulizia dello stato dell'applicazione (cleanup() method)
+### State Management
+Implements BLoC (Business Logic Component) pattern for:
+- Separation between business logic and UI
+- Reactive event handling
+- Simplified component testing
 
-### Estensibilità futura
-L'architettura modulare permette facilmente:
-- Aggiunta nuovi tipi di messaggi (file, media, emoji)
-- Implementazione cifratura end-to-end
-- Integrazione servizi esterni (notifiche push)
-- Scaling orizzontale con load balancing
-- Migrazione a database distribuiti (PostgreSQL, MongoDB)
+### Client-Server Communication
+
+#### Protocols Used
+- **HTTP/HTTPS**: REST APIs for CRUD operations
+- **WebSocket**: Real-time bidirectional communication for notifying clients upon message and invitation receipt
+- **JSON**: Standardized data exchange format
+
+### Authentication and Security
+- **JWT tokens**: Stateless authentication with refresh tokens
+- **CORS**: Configurable cross-origin access control
+- **Input validation**: Data sanitization on both client and server sides
+
+### Scalability and Performance
+
+#### Server Optimizations
+- **Connection pooling**: Database connection reuse
+- **Lazy loading**: On-demand data loading
+- **Batch operations**: Batch processing for efficiency
+
+#### Client Optimizations
+- **Pagination**: Incremental message loading
+- **Caching**: Local storage of messages and chats
+- **Background sync**: Background synchronization
+
+## Safety Features
+
+### Backend Safety (Rust)
+Using Rust as the programming language for our server provides guarantees:
+- **Memory safety guaranteed**: Prevents buffer overflows, memory leaks, and data races at compile-time
+- **Ownership system**: Automatic memory management without garbage collection
+- **Error handling with Result<T,E>**: Explicit error handling without unexpected exceptions
+- **Exhaustive pattern matching**: Complete control over all possible cases
+- **Lifetime management**: Prevention of dangling pointers and use-after-free
+
+### Frontend Safety (Flutter/Dart)
+- **Null safety**: Prevention of null pointer exceptions at compile-time
+- **State immutability**: Use of Riverpod with immutable state to prevent accidental modifications
+- **Type safety**: Strong type system to prevent type errors
+- **Structured exception handling**: Try-catch blocks for controlled error handling
+- **Input validation**: User data checks before processing
+- **Safe navigation**: ?. and ?? operators for safe data access
+
+### Data Safety
+- **Automatic local saving**: Data persistence in local database
+- **Payload validation**: Input and output data validation
+- **Automatic cleanup**: Application state cleanup (cleanup() method)
+
+## Future Extensibility
+The modular architecture easily allows for:
+- Adding new message types (files, media, emojis)
+- Implementing end-to-end encryption
+- Integrating external services (push notifications)
+- Horizontal scaling with load balancing
+- Migration to distributed databases (PostgreSQL, MongoDB)
+
+## Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+[Add your license information here]
+
+## Contact
+[Add your contact information here]
