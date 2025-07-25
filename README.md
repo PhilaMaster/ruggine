@@ -43,8 +43,10 @@ Ruggine is a multiplatform chat application consisting of a Rust backend and a F
 
 The following features are available:
 
-### Registration and Login
-- Register a new account or log in to an existing one
+### Login
+- Log in to an existing one (registration form in flutter is to be implemented)
+   - you are provided with two test account admin:admin, admin2:admin
+   - otherwise you can register a new user using the api, submitting a POST request through postman at baseUrl/auth/register
 - Authentication is handled via JWT tokens
 
 ### Private Messages
@@ -170,11 +172,9 @@ The modular architecture easily allows for:
 - Horizontal scaling with load balancing
 - Migration to distributed databases (PostgreSQL, MongoDB)
 
-## Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-[Add your license information here]
-
-## Contact
-[Add your contact information here]
+## Contributions
+Project developed by students from polito:
+- Pasquale Papalia
+- Adriano Giuliani
+- Borlina Edoardo
+- Federico Ferrari
